@@ -7,7 +7,7 @@ namespace ChannelsListParser.Tests
     public class ChannelAttributes_Should
     {
         [Test]
-        public void Test1()
+        public void Parse_TvgLogoPath_ShouldBeCorrect()
         {
             var attrStr =
                 @"group-title=""Новости;HD"" " 

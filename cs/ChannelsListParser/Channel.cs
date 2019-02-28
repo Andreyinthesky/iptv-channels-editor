@@ -19,7 +19,7 @@ namespace ChannelsListParser
         public string GroupTitle { get; set; }
         public ChannelAttributes Attributes { get; set; }
 
-        private Channel()
+        public Channel()          
         {
         }
         
@@ -70,7 +70,8 @@ namespace ChannelsListParser
         {
             return string.Format(DefinitionFormat, Duration, Attributes, Title)
                    + Environment.NewLine
-                   + Path;
+                   + Path
+                   + Environment.NewLine;
         }
     }
 }

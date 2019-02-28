@@ -3,6 +3,7 @@ using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace ChannelsListParser
@@ -62,6 +63,19 @@ namespace ChannelsListParser
 
             linesEnumerator.Dispose();
             return new Playlist(channels);
+        }
+
+        public override string ToString()
+        {
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine(PREFIX_EXTM3U);
+            
+            foreach (var channel in Channels)
+            {
+                stringBuilder.Append(channel);
+            }
+
+            return stringBuilder.ToString();
         }
     }
 }

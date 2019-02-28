@@ -39,7 +39,6 @@ namespace IptvChannelsEditor.Web
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 

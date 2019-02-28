@@ -18,6 +18,7 @@ namespace ChannelsListParser
         public string GroupTitle { get; set; }
 
         public ChannelAttributes()
+            :this(null, null, null, null)
         {
         }
 
