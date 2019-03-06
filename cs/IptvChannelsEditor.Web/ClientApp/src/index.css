@@ -1,27 +1,7 @@
-@media (max-width: 767px) {
-    /* On small screens, the nav menu spans the full width of the screen. Leave a space for it. */
-    body {
-        padding-top: 50px;
-    }
-}
-
 img.tvg-logo {
     width: 50px;
-    margin-right: 20px;
-    vertical-align: middle;
 }
 
 input:disabled{
-    background-color: white;
     color: black;
-    border: none;
-}
-
-input{
-    background-color: white;
-    color: black;
-    border-bottom-color: black;
-    border-top: none;
-    border-left: none;
-    border-right: none;
 }

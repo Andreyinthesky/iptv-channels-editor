@@ -1,16 +1,34 @@
-import './index.css';
+import './index.css'
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import App from './App';
 import unregisterServiceWorker from './registerServiceWorker';
 
 const baseUrl = document.getElementsByTagName('base')[0].getAttribute('href');
 const rootElement = document.getElementById('root');
+const bodyElement = document.getElementById('body');
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#1e90ff',
+    },
+    secondary: {
+      main: '#f50057',
+    },
+  },
+  typography: { useNextVariants: true },
+});
+
+bodyElement.style.backgroundColor = theme.palette.primary.main;
 
 ReactDOM.render(
   <BrowserRouter basename={baseUrl}>
-    <App />
+    <MuiThemeProvider theme={theme}>
+      <App />
+    </MuiThemeProvider>
   </BrowserRouter>,
   rootElement
 );
