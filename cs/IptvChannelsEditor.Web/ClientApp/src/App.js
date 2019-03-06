@@ -1,7 +1,35 @@
 import React, { Component } from 'react';
-import {Channels} from "./components/Channels";
+import Channels from "./components/Channels";
+import PropTypes from 'prop-types';
+import withStyles from '@material-ui/core/styles/withStyles';
+import Typography from '@material-ui/core/Typography';
+import Paper from '@material-ui/core/Paper';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from "@material-ui/core/es/Toolbar";
 
-export default class App extends Component {
+const playlistPaperStyles = theme => ({
+  paper: {
+    ...theme.mixins.gutters(),
+    paddingTop: theme.spacing.unit * 2,
+    paddingBottom: theme.spacing.unit * 2,
+    marginLeft: theme.spacing.unit * 9,
+    marginTop: theme.spacing.unit * 9,
+    marginRight: theme.spacing.unit * 9,
+  },
+  appIcon: {
+    width: theme.spacing.unit * 5,
+    height: theme.spacing.unit * 5,
+    marginRight: theme.spacing.unit * 2,
+  },
+  root: {
+    flexGrow: 1,
+  },
+  title: {
+    flexGrow: 1,
+  },
+});
+
+class App extends Component {
   displayName = App.name;
 
   constructor(props) {
@@ -29,6 +57,7 @@ export default class App extends Component {
         channels.map((channel, index) =>
         {
           channel.id = index;
+          channel.selected = false;
           return channel;
         });
         this.setState({channels: channels, loading: false});
@@ -43,6 +72,7 @@ export default class App extends Component {
         playlist.channels.map((channel, index) =>
         {
           channel.id = index;
+          channel.selected = false;
           return channel;
         });
         
@@ -58,7 +88,9 @@ export default class App extends Component {
 
     return (
       <div>
-        <h3>Choose file for upload</h3>
+        <Typography variant='h3' color='primary'>
+          Choose file for upload
+        </Typography>
         <form onSubmit={this.handleUploadPlaylist}>
           <label>
             Upload file:
@@ -76,15 +108,32 @@ export default class App extends Component {
     if (this.state.loading){
       this.loadSampleChannels();
     }
+    
+    const {classes} = this.props;
+    
     return (
-      <div>
-        <h3>Sample channels</h3>
-        {
-          !this.state.loading &&
-          <Channels channels={this.channels}
-          />
-        }
+      <div className={classes.root}>
+        <AppBar position="fixed">
+          <Toolbar>
+            <img alt='IPTV' className={classes.appIcon} src={require("./icons/app-icon.svg")}/>
+            <Typography variant="h6" color="inherit" className={classes.title}>
+              IPTV Channels editor
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Paper className={classes.paper} elevation={1} square={true}>
+          <Typography variant='h3' paragraph={true}>
+            Sample channels
+          </Typography>
+          {!this.state.loading && <Channels channels={this.channels}/>}
+        </Paper>
       </div>
     );
   }
 }
+
+App.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(playlistPaperStyles)(App);

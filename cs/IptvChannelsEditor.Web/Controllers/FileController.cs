@@ -31,6 +31,12 @@ namespace IptvChannelsEditor.Web.Controllers
             return Playlist.Parse(fileData).Channels;
         }
 
+        [HttpPost("[action]")]
+        public IActionResult DownloadPlaylist()
+        {
+            return RedirectToAction(nameof(Download));
+        }
+
         [HttpGet("[action]")]
         public IActionResult Download()
         {
