@@ -8,7 +8,7 @@ namespace IptvChannelsEditor.Web.Controllers
     public class SampleChannelsController
     {
         [HttpGet]
-        public Playlist GetChannels()
+        public ChannelsListParser.Playlist GetChannels()
         {
             var channels =
                 new[]
@@ -21,7 +21,7 @@ namespace IptvChannelsEditor.Web.Controllers
                         new ChannelAttributes(null, "https://webarmen.com/my/iptv/uploads/icon/1.png", null, null)),
                 };
 
-            return new Playlist(channels);
+            return new ChannelsListParser.Playlist(channels, "sample playlist");
         }
     }
 }

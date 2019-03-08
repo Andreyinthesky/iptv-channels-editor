@@ -1,27 +1,38 @@
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace ChannelsListParser
 {
     public class Playlist
     {
-        public IEnumerable<Channel> Channels { get; }
-
+        public Guid Id { get; private set; }
+        public string Name { get; set; }
+        // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Local
+        public IEnumerable<Channel> Channels { get; private set; }
+        
+        [BsonElement]
+        private int nextChannelNumber = 0;
+        
         private const string PREFIX_EXTM3U = "#EXTM3U";
         private const string PREFIX_EXTINF = "#EXTINF:";
         private const string PREFIX_EXTGRP = "#EXTGRP:";
-        private const string PREFIX_COMMENT = "#";
-        
+        private const string PREFIX_COMMENT = "#";        
         private const string EXTGRP = @"#EXTGRP:(?<group>.*)";
 
-        public Playlist(IEnumerable<Channel> channels)
+        public Playlist(IEnumerable<Channel> channels, string name = null)
+            :this(Guid.Empty, channels, name)
         {
+        }
+        
+        public Playlist(Guid id, IEnumerable<Channel> channels, string name = null)
+        {
+            Id = id;
             Channels = channels;
+            Name = name;
         }
 
         public static Playlist Parse(string str)
@@ -60,7 +71,7 @@ namespace ChannelsListParser
                     channels.Add(Channel.Parse(definition, channelPath, group));
                 }
             }
-
+            
             linesEnumerator.Dispose();
             return new Playlist(channels);
         }

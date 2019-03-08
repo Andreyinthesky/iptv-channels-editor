@@ -1,3 +1,4 @@
+using IptvChannelsEditor.Web.Domain;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -5,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Driver;
 
 namespace IptvChannelsEditor.Web
 {
@@ -17,13 +19,18 @@ namespace IptvChannelsEditor.Web
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
+            services.AddMvc(options =>
+            {
+                // Эта настройка позволяет отвечать кодом 406 Not Acceptable на запросы неизвестных форматов.
+                options.ReturnHttpNotAcceptable = true;
+            });
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/build"; });
+            services.AddSingleton<IMongoDatabaseProvider, IptvChannelsEditorMongoDatabase>();
+            services.AddSingleton<IPlaylistRepository, MongoPlaylistRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

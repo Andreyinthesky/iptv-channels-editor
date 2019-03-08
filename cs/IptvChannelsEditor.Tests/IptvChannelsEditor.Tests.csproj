@@ -4,10 +4,13 @@
         <TargetFramework>netcoreapp2.1</TargetFramework>
 
         <IsPackable>false</IsPackable>
+
+        <RootNamespace>IptvChannelsEditor.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="5.6.0" />
+        <PackageReference Include="MongoDB.Driver" Version="2.7.3" />
         <PackageReference Include="nunit" Version="3.10.1" />
         <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
@@ -15,15 +18,12 @@
 
     <ItemGroup>
       <ProjectReference Include="..\ChannelsListParser\ChannelsListParser.csproj" />
+      <ProjectReference Include="..\IptvChannelsEditor.Web\IptvChannelsEditor.Web.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="Files\test-perf-10000.m3u">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Files\test-perf-1000.m3u">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
+      <Content Include="ParserTests\Files\test-perf-1000.m3u" />
+      <Content Include="ParserTests\Files\test-perf-10000.m3u" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace ChannelsListParser
 {
@@ -15,6 +16,7 @@ namespace ChannelsListParser
         public string TvgId { get; set; }
         public string TvgLogoPath { get; set; }
         public string TvgName { get; set; }
+        [BsonIgnore]
         public string GroupTitle { get; set; }
 
         public ChannelAttributes()

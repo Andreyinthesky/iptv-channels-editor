@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28307.271
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChannelsListParser", "ChannelsListParser\ChannelsListParser.csproj", "{B1F05346-2197-4A39-8696-9D487F7E9F8E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChannelsListParser.Tests", "ChannelsListParser.Tests\ChannelsListParser.Tests.csproj", "{439AD2F0-8A06-4D1B-94C1-4FF7230BB335}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IptvChannelsEditor.Tests", "IptvChannelsEditor.Tests\IptvChannelsEditor.Tests.csproj", "{439AD2F0-8A06-4D1B-94C1-4FF7230BB335}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IptvChannelsEditor.Web", "IptvChannelsEditor.Web\IptvChannelsEditor.Web.csproj", "{896C7D4D-C961-4A7F-B5C0-82EF0E2F1DD5}"
 EndProject
