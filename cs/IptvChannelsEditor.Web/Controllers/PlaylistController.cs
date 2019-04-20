@@ -2,10 +2,14 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using IptvChannelsEditor.Web.Domain;
 using IptvChannelsEditor.Web.Helpers;
+using IptvChannelsEditor.Web.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace IptvChannelsEditor.Web.Controllers
 {
@@ -43,8 +47,8 @@ namespace IptvChannelsEditor.Web.Controllers
             return Ok(playlist);
         }
 
-        [HttpGet("[action]/{id}")]
-        public IActionResult Download([FromQuery]Guid playlistId)
+        [HttpGet("[action]/{playlistId}")]
+        public IActionResult Download([FromRoute]Guid playlistId)
         {         
             var fileName = "Playlist " + DateTime.Now + ".m3u";
             var playlist = repository.FindById(playlistId);
@@ -65,16 +69,41 @@ namespace IptvChannelsEditor.Web.Controllers
             return result;
         }
 
-        [HttpPatch("[action]")]
-        public IActionResult Update([FromBody] Playlist playlist)
-        {
-            throw new NotImplementedException();
+        [HttpPatch("{playlistId}")]
+        public IActionResult Update([FromRoute] Guid playlistId, [FromBody]UpdatePlaylistDto playlistDto)
+        {          
+            if (playlistDto == null)
+            {
+                return BadRequest();                
+            }
+
+            var playlistForUpdate = playlistId != Guid.Empty ? repository.FindById(playlistId) : null;
+            if (playlistForUpdate == null)
+            {
+                return NotFound();
+            }
+            
+            if (!TryValidateModel(playlistDto))
+            {
+                return new UnprocessableEntityObjectResult(ModelState);
+            }
+            
+            var updatedPlaylist = Mapper.Map(playlistDto, playlistForUpdate);
+            repository.Update(updatedPlaylist);
+            return NoContent();
         }
         
-        [HttpDelete("[action]/{id}")]
-        public IActionResult Delete([FromQuery] Guid playlistId)
+        [HttpDelete("{playlistId}")]
+        public IActionResult Delete([FromRoute] Guid playlistId)
         {
-            throw new NotImplementedException();
+            var retrievedPlaylist = playlistId != Guid.Empty ? repository.FindById(playlistId) : null;
+            
+            if (retrievedPlaylist == null)
+            {
+                return NotFound();
+            }
+            
+            return NoContent();
         }
     }
 }

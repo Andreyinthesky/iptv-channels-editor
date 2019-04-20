@@ -1,4 +1,7 @@
+using AutoMapper;
+using ChannelsListParser;
 using IptvChannelsEditor.Web.Domain;
+using IptvChannelsEditor.Web.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -7,6 +10,8 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace IptvChannelsEditor.Web
 {
@@ -24,13 +29,23 @@ namespace IptvChannelsEditor.Web
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMvc(options =>
             {
-                // Эта настройка позволяет отвечать кодом 406 Not Acceptable на запросы неизвестных форматов.
                 options.ReturnHttpNotAcceptable = true;
+            })
+            .AddJsonOptions(options =>
+            {
+                options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                options.SerializerSettings.DefaultValueHandling = DefaultValueHandling.Populate;
             });
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/build"; });
             services.AddSingleton<IMongoDatabaseProvider, IptvChannelsEditorMongoDatabase>();
             services.AddSingleton<IPlaylistRepository, MongoPlaylistRepository>();
+            
+            Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<UpdatePlaylistDto, Playlist>();
+                cfg.CreateMap<Playlist, UpdatePlaylistDto>();
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

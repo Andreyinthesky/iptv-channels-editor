@@ -21,7 +21,7 @@ namespace ChannelsListParser
         private const string PREFIX_EXTINF = "#EXTINF:";
         private const string PREFIX_EXTGRP = "#EXTGRP:";
         private const string PREFIX_COMMENT = "#";        
-        private const string EXTGRP = @"#EXTGRP:(?<group>.*)";
+        private const string EXTGRP_REGEX = @"#EXTGRP:(?<group>.*)";
 
         public Playlist(IEnumerable<Channel> channels, string name = null)
             :this(Guid.Empty, channels, name)
@@ -64,7 +64,7 @@ namespace ChannelsListParser
                     }
 
                     group = group == null ? null : Regex
-                        .Match(group, EXTGRP, RegexOptions.CultureInvariant)
+                        .Match(group, EXTGRP_REGEX, RegexOptions.CultureInvariant)
                         .Groups["group"]
                         .Value;
                     

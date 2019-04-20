@@ -4,17 +4,16 @@ import Grid from '@material-ui/core/Grid';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import CheckBox from '@material-ui/core/Checkbox';
-import TextField from '@material-ui/core/TextField';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
-import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import DoneIcon from '@material-ui/icons/Done';
 import CancelIcon from '@material-ui/icons/Cancel';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 
 
 export class ChannelTableRow extends Component {
-
   constructor(props){
     super(props);
     this.state = {
@@ -28,19 +27,11 @@ export class ChannelTableRow extends Component {
   handleSelectChannel = () => {
     let channel = this.props.channel;
     channel.selected = !channel.selected;
-    this.props.onSelectChannel();
+    this.props.onSelectChannel(this.props.index);
   };
   
   handleEditChannel = () => {
-    let channel = this.props.channel;
-    if (this.state.isEdit){
-      console.log('save');
-      channel.title = this.titleRef.current.value;
-      channel.groupTitle = this.groupTitleRef.current.value;
-      channel.path = this.pathRef.current.value;
-      this.props.onEditChannel(channel);
-    }
-    this.setState({isEdit: !this.state.isEdit});
+    this.props.onEditChannel(this.props.index);
   };
 
   handleCancelEditChannel = () => {
@@ -51,10 +42,7 @@ export class ChannelTableRow extends Component {
     this.pathRef.current.value = channel.path;
     this.setState({isEdit: !this.state.isEdit});
   };
-
-  handleDeleteChannel = () => {
-    this.props.onDeleteChannel(this.props.index);
-  };
+  
   
   handleInsertBeforeChannel = () => {
     this.props.onInsertChannel(this.props.index);
@@ -64,6 +52,14 @@ export class ChannelTableRow extends Component {
     this.props.onInsertChannel(this.props.index + 1);
   };
   
+  handleMoveUpChannel = () => {
+    console.log("up");  
+  };
+
+  handleMoveDownChannel = () => {
+    console.log("down");
+  };
+  
   render() {
     const channel = this.props.channel;
     const channelAttrs = channel.attributes;
@@ -71,23 +67,28 @@ export class ChannelTableRow extends Component {
     return (
       <TableRow>
         <TableCell>
-          <CheckBox color="primary" onClick={this.handleSelectChannel}/>
+          <CheckBox color="primary" onClick={this.handleSelectChannel} checked={channel.selected}/>
         </TableCell>
         <TableCell>
-          <Grid container direction="row" justify="space-around" alignItems="center">
+          <Grid container direction="row" justify="flex-start" alignItems="center">
             {channelAttrs.tvgLogoPath && <img className="tvg-logo" src={channelAttrs.tvgLogoPath} alt="logo"/>}
-            <TextField inputRef={this.titleRef} disabled={!this.state.isEdit} defaultValue={channel.title}/>
+            {channel.title}
           </Grid>
         </TableCell>
         <TableCell>
-          <TextField inputRef={this.groupTitleRef} disabled={!this.state.isEdit}
-                 defaultValue={channel.groupTitle == null ? 'None' : channel.groupTitle} />
+          {!channel.groupTitle ? 'Неизвестно' : channel.groupTitle}
         </TableCell>
         <TableCell>
-          <TextField inputRef={this.pathRef} disabled={!this.state.isEdit} defaultValue={channel.path} />
+           {channel.path}
         </TableCell>
         <TableCell>
-          <Tooltip title={this.state.isEdit ? 'Apply' : 'Edit'}>
+          <IconButton onClick={this.handleMoveUpChannel}>
+            <ExpandLessIcon/>
+          </IconButton>
+          <IconButton onClick={this.handleMoveDownChannel}>
+            <ExpandMoreIcon/>
+          </IconButton>
+          <Tooltip title={'Редактировать'}>
             <IconButton onClick={this.handleEditChannel} aria-label="Edit">
               {this.state.isEdit ? <DoneIcon /> : <EditIcon />}
             </IconButton>
@@ -100,11 +101,6 @@ export class ChannelTableRow extends Component {
               </IconButton>
             </Tooltip>
           }
-          <Tooltip title='Delete'>
-            <IconButton onClick={this.handleDeleteChannel} aria-label="Delete">
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
           <InsertChannelMenu
             onInsertBeforeChannel={this.handleInsertBeforeChannel}
             onInsertAfterChannel={this.handleInsertAfterChannel}

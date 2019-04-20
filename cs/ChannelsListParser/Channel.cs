@@ -7,7 +7,7 @@ namespace ChannelsListParser
 {
     public class Channel
     {
-        private const string DEFINITION =
+        private const string DefinitionRegex =
             @"#EXTINF:(?<duration>-1|\d+)(?<attributes>.*)?,\s?(?<title>.*)";
 
         private const string DefinitionFormat =
@@ -48,7 +48,7 @@ namespace ChannelsListParser
             var channel = new Channel();
             try
             {
-                var match = Regex.Match(definition, DEFINITION, RegexOptions.CultureInvariant);
+                var match = Regex.Match(definition, DefinitionRegex, RegexOptions.CultureInvariant);
                 channel.Duration = int.Parse(match.Groups["duration"].Value);
                 channel.Title = match.Groups["title"].Value;
                 channel.Path = path;
@@ -69,6 +69,7 @@ namespace ChannelsListParser
         public override string ToString()
         {
             return string.Format(DefinitionFormat, Duration, Attributes, Title)
+                   + (GroupTitle == null ? "" : Environment.NewLine + GroupTitle)
                    + Environment.NewLine
                    + Path
                    + Environment.NewLine;

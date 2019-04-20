@@ -1,5 +1,6 @@
 export function getDefaultChannel() {
   return {
+    selected: false,
     attributes: {
       groupTitle: null,
       tvgId: null,

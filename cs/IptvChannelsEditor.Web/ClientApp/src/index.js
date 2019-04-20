@@ -23,6 +23,7 @@ const theme = createMuiTheme({
 });
 
 bodyElement.style.backgroundColor = theme.palette.primary.main;
+bodyElement.style.margin = '0px';
 
 ReactDOM.render(
   <BrowserRouter basename={baseUrl}>

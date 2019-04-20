@@ -43,8 +43,8 @@ export default class InsertChannelMenu extends Component {
           open={Boolean(anchorEl)}
           onClose={this.handleClose}
         >
-          <MenuItem onClick={this.handleInsertBeforeChannel}>Insert Before</MenuItem>
-          <MenuItem onClick={this.handleInsertAfterChannel}>Insert After</MenuItem>
+          <MenuItem onClick={this.handleInsertBeforeChannel}>Вставить до</MenuItem>
+          <MenuItem onClick={this.handleInsertAfterChannel}>Вставить после</MenuItem>
         </Menu>
       </span>
       

@@ -1,121 +1,47 @@
 import React, {Component} from "react";
 import {ChannelTable} from "./ChannelTable";
-import PropTypes from "prop-types";
-import {getDefaultChannel} from "../helpers/playlistHelpers";
-import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import DeleteIcon from '@material-ui/icons/Delete';
+import EditChannelForm from "./EditChannelForm";
 
-const styles = theme => ({
-  leftIcon: {
-    marginRight: theme.spacing.unit,
-  },
-  selectActionsPanel: {
-    marginTop: theme.spacing.unit * 2,
-  },
-});
-
-class Channels extends Component {
+export default class Channels extends Component {
 
   constructor(props){
     super(props);
+    this.handleSelectChannel = props.onSelectChannel;
+    this.handleInsertChannel = props.onInsertChannel;
+    this.handleChangeChannel = props.onChangeChannel;
     this.state = {
-      channels : props.channels,
-      hasSelectedChannels : false,
-    };
+      channelIndexForEdit : -1,
+    }
   }
-
-  hasSelectedChannels = (channels) => {
-    for (let i = 0; i < channels.length; i++) {
-      if (channels[i] && channels[i].selected)
-        return true;
-    }
-    return false;
-  };
   
-  handleSelectChannel = () => {
-    let hasSelected = this.hasSelectedChannels(this.state.channels);
-    if (hasSelected !== this.state.hasSelectedChannels) {
-      this.setState({hasSelectedChannels: hasSelected});
-    }
+  handleEditChannel = (index) => {
+    this.setState({channelIndexForEdit: index});
   };
 
-  handleEditChannel = channel => {
-    console.log(channel);
-  };
-
-  handleDeleteChannel = channelIndex => {
-    const channels = this.state.channels.slice();
-    delete channels[channelIndex];
-    let hasSelected = this.hasSelectedChannels(channels);
-    this.setState({channels: channels, hasSelectedChannels: hasSelected});
-  };
-
-  handleDeleteSelectedChannels = () => {
-    const channels = this.state.channels.slice();
-    for (let i = 0; i < channels.length; i++) {
-      if (channels[i] && channels[i].selected)
-        delete channels[i];
-    }
-    this.setState({channels: channels, hasSelectedChannels : false});
-  };
-  
-  handleInsertChannel = channelIndex => {
-    let newChannel = getDefaultChannel();
-    newChannel.id = this.state.channels.length;
-    newChannel.title += newChannel.id;
-    const channels = this.state.channels.slice();
-    channels.splice(channelIndex, 0, newChannel);
-    this.setState({channels: channels});
-  };
-
-  handleDownloadPlaylist = (event) => {
-    const channels = this.state.channels.filter(ch => ch !== undefined);
-    if (channels.length === 0)
-      return;
-    console.log(channels);
-    // let xhr = new XMLHttpRequest();
-    // xhr.open('POST', 'api/file/downloadPlaylist', false);
-    // xhr.send();
-    // fetch('api/file/downloadPlaylist', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   // body: JSON.stringify(channels)
-    // // }).then(response => {
-    // //   response.r
-    // }).catch(error => console.error('Error:', error));
+  handleCloseEditChannelForm = (changedChannel) => {
+    const index = this.state.channelIndexForEdit;
+    this.setState({channelIndexForEdit : -1}, () => {
+      this.handleChangeChannel(index, changedChannel);
+    });
   };
 
   render() {
-    const {classes} = this.props;
+    const {channels} = this.props;
+    
     return (
       <div>
         <ChannelTable
-          channels={this.state.channels}
+          channels={channels}
           onEditChannel={this.handleEditChannel}
-          onDeleteChannel={this.handleDeleteChannel}
           onInsertChannel={this.handleInsertChannel}
           onSelectChannel={this.handleSelectChannel}
         />
-        {/*<a onClick={this.handleDownloadPlaylist}><button>Download</button></a>*/}
-        {
-          this.state.hasSelectedChannels &&
-          <div className={classes.selectActionsPanel}>
-            <Button variant='contained' color='secondary' onClick={this.handleDeleteSelectedChannels}>
-              <DeleteIcon className={classes.leftIcon} />
-              Delete Selected
-            </Button>
-          </div>
-        }
+        {this.state.channelIndexForEdit >= 0 && 
+        <EditChannelForm
+          channel={channels[this.state.channelIndexForEdit]}
+          onClose={this.handleCloseEditChannelForm}
+        />}
       </div>
     );
   }
 }
-
-Channels.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
-
-export default withStyles(styles)(Channels);
