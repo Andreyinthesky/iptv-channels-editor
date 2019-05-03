@@ -79,8 +79,17 @@ class MainForm extends React.Component {
         method: 'POST',
         body: formData
       })
-        .then(response => response.json())
+        .then(response => {
+          if (response.status !== 200) {
+            console.error('App Error: status: ' + response.status);
+            this.setState({isChoosingFile: false, isUploadingFile: false});
+            return;
+          }
+          return response.json();
+        })
         .then(playlist => {
+          if (!playlist || playlist.channels === undefined)
+            return;
           this.props.onUpload(playlist);
         })
         .catch(error => console.error('Error:', error));
