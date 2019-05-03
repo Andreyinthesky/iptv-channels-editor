@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.271
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChannelsListParser", "ChannelsListParser\ChannelsListParser.csproj", "{B1F05346-2197-4A39-8696-9D487F7E9F8E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IptvChannelsEditor.Tests", "IptvChannelsEditor.Tests\IptvChannelsEditor.Tests.csproj", "{439AD2F0-8A06-4D1B-94C1-4FF7230BB335}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IptvChannelsEditor.Web", "IptvChannelsEditor.Web\IptvChannelsEditor.Web.csproj", "{896C7D4D-C961-4A7F-B5C0-82EF0E2F1DD5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "M3UPlaylistParser", "M3UPlaylistParser\M3UPlaylistParser.csproj", "{9E926CFE-589B-442C-A1D0-2E08624724BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "M3UPlaylistParser.Tests", "M3UPlaylistParser.Tests\M3UPlaylistParser.Tests.csproj", "{BB2A1710-37BC-40D7-9FE9-FF7B9163D84A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B1F05346-2197-4A39-8696-9D487F7E9F8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B1F05346-2197-4A39-8696-9D487F7E9F8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B1F05346-2197-4A39-8696-9D487F7E9F8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B1F05346-2197-4A39-8696-9D487F7E9F8E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{439AD2F0-8A06-4D1B-94C1-4FF7230BB335}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{439AD2F0-8A06-4D1B-94C1-4FF7230BB335}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{439AD2F0-8A06-4D1B-94C1-4FF7230BB335}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -27,6 +25,14 @@ Global
 		{896C7D4D-C961-4A7F-B5C0-82EF0E2F1DD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{896C7D4D-C961-4A7F-B5C0-82EF0E2F1DD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{896C7D4D-C961-4A7F-B5C0-82EF0E2F1DD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E926CFE-589B-442C-A1D0-2E08624724BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E926CFE-589B-442C-A1D0-2E08624724BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E926CFE-589B-442C-A1D0-2E08624724BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E926CFE-589B-442C-A1D0-2E08624724BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB2A1710-37BC-40D7-9FE9-FF7B9163D84A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB2A1710-37BC-40D7-9FE9-FF7B9163D84A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB2A1710-37BC-40D7-9FE9-FF7B9163D84A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB2A1710-37BC-40D7-9FE9-FF7B9163D84A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

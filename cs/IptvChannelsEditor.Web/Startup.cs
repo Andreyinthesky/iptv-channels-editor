@@ -1,15 +1,14 @@
 using AutoMapper;
-using ChannelsListParser;
 using IptvChannelsEditor.Web.Domain;
 using IptvChannelsEditor.Web.Models;
+using IptvChannelsEditor.Web.Models.Entities;
+using IptvChannelsEditor.Web.Models.MapProfile;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MongoDB.Driver;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -43,8 +42,9 @@ namespace IptvChannelsEditor.Web
             
             Mapper.Initialize(cfg =>
             {
-                cfg.CreateMap<UpdatePlaylistDto, Playlist>();
-                cfg.CreateMap<Playlist, UpdatePlaylistDto>();
+                cfg.CreateMap<UpdatePlaylistDto, PlaylistEntity>();
+                cfg.CreateMap<PlaylistEntity, UpdatePlaylistDto>();
+                cfg.AddProfile(new PlaylistEntityMapper());
             });
         }
 

@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
-using ChannelsListParser;
 using IptvChannelsEditor.Web.Domain;
+using IptvChannelsEditor.Web.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
 
 namespace IptvChannelsEditor.Web.Controllers
 {
@@ -19,7 +17,7 @@ namespace IptvChannelsEditor.Web.Controllers
         }   
         
         [HttpGet]
-        public ChannelsListParser.Playlist GetChannels()
+        public PlaylistEntity GetChannels()
         {
             var channels =
                 new[]
@@ -32,7 +30,7 @@ namespace IptvChannelsEditor.Web.Controllers
                         new ChannelAttributes(null, "https://webarmen.com/my/iptv/uploads/icon/1.png", null, null)),
                 };
             
-            var playlist = new ChannelsListParser.Playlist(sampleChannelsId, channels, "sample playlist");
+            var playlist = new PlaylistEntity(sampleChannelsId, channels, "sample playlist");
             var retrievedPlaylist = repository.FindById(sampleChannelsId);
             
             if (retrievedPlaylist != null)

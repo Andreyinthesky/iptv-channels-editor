@@ -1,14 +1,13 @@
 using System;
-using ChannelsListParser;
-using Microsoft.EntityFrameworkCore;
+using IptvChannelsEditor.Web.Models.Entities;
 
 namespace IptvChannelsEditor.Web.Domain
 {
     public interface IPlaylistRepository
     {
-        Playlist Insert(Playlist playlist);
-        void Update(Playlist playlist);
-        Playlist FindById(Guid playlistId);
+        PlaylistEntity Insert(PlaylistEntity playlist);
+        void Update(PlaylistEntity playlist);
+        PlaylistEntity FindById(Guid playlistId);
         void Delete(Guid playlistId);
     }
 }

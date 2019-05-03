@@ -1,36 +1,36 @@
 using System;
-using ChannelsListParser;
+using IptvChannelsEditor.Web.Models.Entities;
 using MongoDB.Driver;
 
 namespace IptvChannelsEditor.Web.Domain
 {
     public class MongoPlaylistRepository : IPlaylistRepository
     {
-        private readonly IMongoCollection<Playlist> playlistCollection;
+        private readonly IMongoCollection<PlaylistEntity> playlistCollection;
         public const string CollectionName = "playlists";
         
         public MongoPlaylistRepository(IMongoDatabase database)
         {
-            playlistCollection = database.GetCollection<Playlist>(CollectionName);
+            playlistCollection = database.GetCollection<PlaylistEntity>(CollectionName);
         }
         
         public MongoPlaylistRepository(IMongoDatabaseProvider provider)
         {
-            playlistCollection = provider.GetDatabase().GetCollection<Playlist>(CollectionName);
+            playlistCollection = provider.GetDatabase().GetCollection<PlaylistEntity>(CollectionName);
         }
         
-        public Playlist Insert(Playlist playlist)
+        public PlaylistEntity Insert(PlaylistEntity playlist)
         {
             playlistCollection.InsertOne(playlist);
             return playlist;
         }
 
-        public void Update(Playlist playlist)
+        public void Update(PlaylistEntity playlist)
         {
             playlistCollection.ReplaceOne(p => playlist.Id == p.Id, playlist);
         }
 
-        public Playlist FindById(Guid playlistId)
+        public PlaylistEntity FindById(Guid playlistId)
         {
             return playlistCollection
                 .Find(playlist => playlist.Id == playlistId)

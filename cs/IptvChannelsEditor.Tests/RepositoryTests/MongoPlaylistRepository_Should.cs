@@ -1,7 +1,7 @@
 using System;
-using ChannelsListParser;
 using FluentAssertions;
 using IptvChannelsEditor.Web.Domain;
+using IptvChannelsEditor.Web.Models.Entities;
 using NUnit.Framework;
 
 namespace IptvChannelsEditor.Tests.RepositoryTests
@@ -23,7 +23,7 @@ namespace IptvChannelsEditor.Tests.RepositoryTests
         public void Insert()
         {
             var playlistName = "default";
-            var playlist = repo.Insert(new Playlist(null, playlistName));
+            var playlist = repo.Insert(new PlaylistEntity(null, playlistName));
             Console.WriteLine(playlist.Id);
             playlist.Id.Should().NotBe(Guid.Empty);
             playlist.Name.Should().Be(playlistName);
@@ -33,7 +33,7 @@ namespace IptvChannelsEditor.Tests.RepositoryTests
         public void Update()
         {
             var playlistName = "default";
-            var playlist = repo.Insert(new Playlist(null, playlistName));
+            var playlist = repo.Insert(new PlaylistEntity(null, playlistName));
             var channels = new[]
             {
                 new Channel(-1, "Первый канал", "http://localhost:3000"),
@@ -41,7 +41,7 @@ namespace IptvChannelsEditor.Tests.RepositoryTests
                 new Channel(-1, "Четвертый канал", "http://localhost:3003"),
             };
             playlistName = "updated";
-            var newPlaylist = new Playlist(playlist.Id, channels, playlistName);
+            var newPlaylist = new PlaylistEntity(playlist.Id, channels, playlistName);
             repo.Update(newPlaylist);
             var retrievedPlaylist = repo.FindById(playlist.Id);
             retrievedPlaylist.Channels.Should().HaveCount(3);
@@ -52,7 +52,7 @@ namespace IptvChannelsEditor.Tests.RepositoryTests
         public void FindById()
         {
             var playlistName = "default";
-            var playlist = new Playlist(null, playlistName);
+            var playlist = new PlaylistEntity(null, playlistName);
             repo.Insert(playlist);
             repo.FindById(playlist.Id).Should().NotBe(null);
         }
@@ -61,7 +61,7 @@ namespace IptvChannelsEditor.Tests.RepositoryTests
         public void Delete()
         {
             var playlistName = "default";
-            var playlist = new Playlist(null, playlistName);
+            var playlist = new PlaylistEntity(null, playlistName);
             repo.Delete(playlist.Id);
             repo.FindById(playlist.Id).Should().Be(null);
         }

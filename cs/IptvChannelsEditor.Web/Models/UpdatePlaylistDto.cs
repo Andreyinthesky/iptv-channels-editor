@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using ChannelsListParser;
+using IptvChannelsEditor.Web.Models.Entities;
 
 namespace IptvChannelsEditor.Web.Models
 {

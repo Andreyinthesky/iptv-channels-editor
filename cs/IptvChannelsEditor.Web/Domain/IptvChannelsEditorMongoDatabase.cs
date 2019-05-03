@@ -1,4 +1,3 @@
-using System;
 using MongoDB.Driver;
 
 namespace IptvChannelsEditor.Web.Domain

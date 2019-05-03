@@ -17,13 +17,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ChannelsListParser\ChannelsListParser.csproj" />
       <ProjectReference Include="..\IptvChannelsEditor.Web\IptvChannelsEditor.Web.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Content Include="ParserTests\Files\test-perf-1000.m3u" />
-      <Content Include="ParserTests\Files\test-perf-10000.m3u" />
+      <ProjectReference Include="..\M3UPlaylistParser\M3UPlaylistParser.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,50 +1,49 @@
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using IptvChannelsEditor.Web.Domain;
 using IptvChannelsEditor.Web.Helpers;
 using IptvChannelsEditor.Web.Models;
+using IptvChannelsEditor.Web.Models.Entities;
+using M3UPlaylistParser;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using Microsoft.Win32.SafeHandles;
 
 namespace IptvChannelsEditor.Web.Controllers
 {
     [Route("api/[controller]")]
-    public class Playlist : Controller
+    public class PlaylistController : Controller
     {
         private readonly IPlaylistRepository repository;
         
-        public Playlist(IPlaylistRepository repository)
+        public PlaylistController(IPlaylistRepository repository)
         {
             this.repository = repository;
         }
         
         [HttpPost("[action]")]
-        public async Task<IActionResult> Upload(IFormFile file)
+        public IActionResult Upload(IFormFile file)
         {
-            string fileData = null;
-
             if (file == null)
             {
                 return BadRequest();
             }
-            
-            using (var memoryStream = new MemoryStream())
-            {
-                await file.CopyToAsync(memoryStream);
-                var fileBytes = memoryStream.ToArray();
-                fileData = Encoding.UTF8.GetString(fileBytes);
+
+            Playlist playlist;
+            using (var fileStream = file.OpenReadStream())
+            {   
+                playlist = Playlist.Parse(fileStream);
             }
+
+            var playlistEntity = Mapper.Map<Playlist, PlaylistEntity>(playlist);
+            playlistEntity.Name = FileHelpers.GetPlaylistNameFromFileName(file.FileName);
+            repository.Insert(playlistEntity);
             
-            var playlist = ChannelsListParser.Playlist.Parse(fileData);
-            playlist.Name = FileHelpers.GetPlaylistNameFromFileName(file.FileName);
-            repository.Insert(playlist);
-            
-            return Ok(playlist);
+            return Ok(playlistEntity);
         }
 
         [HttpGet("[action]/{playlistId}")]
@@ -59,14 +58,11 @@ namespace IptvChannelsEditor.Web.Controllers
             }
             
             var contentType = "application/mpegurl";
-            FileContentResult result;
-            using (var memoryStream = new MemoryStream())
-            {
-                memoryStream.WriteAsync(Encoding.UTF8.GetBytes(playlist.ToString()));
-                result = File(memoryStream.ToArray(), contentType, fileName);
-            }
-
-            return result;
+            var memoryStream = new MemoryStream();
+            playlist.Channels
+                .ForEach(channel => memoryStream.Write(Encoding.UTF8.GetBytes(channel.ToString())));
+            memoryStream.Position = 0;
+            return File(memoryStream, contentType, fileName);
         }
 
         [HttpPatch("{playlistId}")]
