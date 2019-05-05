@@ -14,6 +14,7 @@ import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import EditPlaylistNameForm from "./components/EditPlaylistNameForm";
 import lightGreen from '@material-ui/core/colors/lightGreen';
+import MainForm from "./components/MainForm";
 
 
 const appStyles = theme => ({
@@ -211,9 +212,9 @@ class App extends Component {
   
   render() {
     if (this.state.loading) {
-      // return (
-        {/*<MainForm onUpload={this.loadPlaylist} />);*/}
-      this.loadSampleChannels();
+      return (
+        <MainForm onUpload={this.loadPlaylist} />);
+      // this.loadSampleChannels();
     }
     
     const {classes} = this.props;

@@ -44,7 +44,7 @@ const mainFormStyles = theme => ({
   },
   title: {
     flexGrow: 1,
-    marginBottom: '25px',
+    marginBottom: '13px',
     color: theme.palette.common.white,
   },
 });
