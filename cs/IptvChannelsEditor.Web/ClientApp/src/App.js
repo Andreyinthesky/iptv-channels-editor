@@ -13,6 +13,7 @@ import {getDefaultChannel} from "./helpers/playlistHelpers";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import EditPlaylistNameForm from "./components/EditPlaylistNameForm";
+import lightGreen from '@material-ui/core/colors/lightGreen';
 
 
 const appStyles = theme => ({
@@ -44,6 +45,7 @@ const appStyles = theme => ({
   playlistToolbarIcon: {
     marginLeft: theme.spacing.unit * 2, 
     verticalAlign: 'bottom',
+    borderRadius: '20px',
   },
   playlistName: {
     maxWidth: '400px',
@@ -71,10 +73,14 @@ const appStyles = theme => ({
   },
   downloadButton: {
     marginTop: theme.spacing.unit * 2,
-    backgroundColor: '#1fe218',
     marginLeft: theme.spacing.unit * 2,
     minWidth: '100px',
     width: '220px',
+    color: theme.palette.getContrastText(lightGreen['A400']),
+    backgroundColor: lightGreen['A400'],
+    '&:hover': {
+      backgroundColor: lightGreen['A700'],
+    }
   }
 });
 
