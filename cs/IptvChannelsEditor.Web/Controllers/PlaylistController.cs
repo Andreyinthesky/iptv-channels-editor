@@ -49,15 +49,16 @@ namespace IptvChannelsEditor.Web.Controllers
         [HttpGet("[action]/{playlistId}")]
         public IActionResult Download([FromRoute]Guid playlistId)
         {         
-            var fileName = "Playlist " + DateTime.Now + ".m3u";
             var playlist = repository.FindById(playlistId);
-
+            
             if (playlist == null)
             {
                 return NotFound();
             }
             
+            var fileName = playlist.Name + " " + DateTime.Now + ".m3u";
             var contentType = "application/mpegurl";
+            
             var memoryStream = new MemoryStream();
             playlist.Channels
                 .ForEach(channel => memoryStream.Write(Encoding.UTF8.GetBytes(channel.ToString())));

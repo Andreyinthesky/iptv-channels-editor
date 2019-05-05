@@ -2,18 +2,17 @@ import React, { Component } from 'react';
 import Channels from "./components/Channels";
 import AppBarForSelected from './components/AppBarForSelected';
 import AppBarMain from "./components/AppBarMain";
-import MainForm from "./components/MainForm";
 import PropTypes from 'prop-types';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
-import IconButton from "@material-ui/core/IconButton";
-import Tooltip from "@material-ui/core/Tooltip";
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import EditIcon from '@material-ui/icons/Edit';
 import DoneIcon from '@material-ui/icons/Done';
 import {getDefaultChannel} from "./helpers/playlistHelpers";
 import Button from "@material-ui/core/Button";
+import Grid from "@material-ui/core/Grid";
+import EditPlaylistNameForm from "./components/EditPlaylistNameForm";
 
 
 const appStyles = theme => ({
@@ -47,7 +46,7 @@ const appStyles = theme => ({
     verticalAlign: 'bottom',
   },
   playlistName: {
-    maxWidth: '600px',
+    maxWidth: '400px',
     textOverflow : 'ellipsis',
     overflow : 'hidden',
     display: 'inline-block',
@@ -90,6 +89,7 @@ class App extends Component {
       selectedChannelsCount: 0,
       allChangesSaved: true,
       playlistName : null,
+      openEditPlaylistNameForm: false,
       channels : [],
     };
   }
@@ -143,11 +143,17 @@ class App extends Component {
     this.setState({channels: newChannels, allChangesSaved: false});
   };
 
+  handleClickEditPlaylistNameButton = () => {
+    this.setState({openEditPlaylistNameForm: true});
+  };
+  
   handleChangePlaylistName = (newPlaylistName) => {
-    if (!newPlaylistName)
-      return;
-    
-    this.setState({playlistName: newPlaylistName, allChangesSaved: false});
+    this.setState({openEditPlaylistNameForm: false}, () => {
+      if (!newPlaylistName || newPlaylistName === this.state.playlistName)
+        return;
+
+      this.setState({playlistName: newPlaylistName, allChangesSaved: false});
+    });
   };
   
   handleSavePlaylist = (e) => {
@@ -199,9 +205,9 @@ class App extends Component {
   
   render() {
     if (this.state.loading) {
-      return (
-        <MainForm onUpload={this.loadPlaylist} />);
-      // this.loadSampleChannels();
+      // return (
+        {/*<MainForm onUpload={this.loadPlaylist} />);*/}
+      this.loadSampleChannels();
     }
     
     const {classes} = this.props;
@@ -224,14 +230,31 @@ class App extends Component {
           }
         { !this.state.loading &&
           <Paper className={classes.paper} elevation={1} square={true}>
-            <Typography variant='h3' paragraph={false} className={classes.playlistName}>
-              {this.state.playlistName}
-            </Typography>
-            <Tooltip title={'Edit'}>
-              <IconButton onClick={() => console.log('edit')} aria-label="Edit" className={classes.playlistToolbarIcon}>
-                {this.state.isEdit ? <DoneIcon /> : <EditIcon />}
-              </IconButton>
-            </Tooltip>
+            <Grid container
+                  direction="row"
+                  justify="flex-start"
+                  alignItems="baseline"
+            >
+              <Typography variant='h3' paragraph={false} className={classes.playlistName}>
+                {this.state.playlistName}
+              </Typography>
+              <Button onClick={this.handleClickEditPlaylistNameButton}
+                      variant="outlined"
+                      size="small"
+                      aria-label="Edit" 
+                      className={classes.playlistToolbarIcon}
+              >
+                {this.state.isEdit ? 
+                  <DoneIcon className={classes.leftIcon} /> : <EditIcon className={classes.leftIcon} />}
+                  Изменить имя
+              </Button>
+            </Grid>
+            { this.state.openEditPlaylistNameForm &&
+              <EditPlaylistNameForm 
+                onClose={this.handleChangePlaylistName}
+                playlistName={this.state.playlistName}
+              />
+            }
             <Channels 
               channels={this.state.channels}
               onSelectChannel={this.handleSelectChannel}
