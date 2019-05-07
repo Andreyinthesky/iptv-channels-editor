@@ -226,9 +226,9 @@ class App extends Component {
   
   render() {
     if (this.state.loading) {
-      return (
-        <MainForm onUpload={this.loadPlaylist} />);
-      // this.loadSampleChannels();
+      // return (
+      //   <MainForm onUpload={this.loadPlaylist} />);
+      this.loadSampleChannels();
     }
     
     const {classes} = this.props;

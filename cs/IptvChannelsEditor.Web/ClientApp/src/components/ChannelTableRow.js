@@ -11,9 +11,34 @@ import DoneIcon from '@material-ui/icons/Done';
 import CancelIcon from '@material-ui/icons/Cancel';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+import {withStyles} from "@material-ui/core";
+import PropTypes from "prop-types";
 
+const channelTableRowStyles = theme => ({
+  pathCell: {
+    maxWidth: '200px',
+    textOverflow : 'ellipsis',
+    overflow : 'hidden',
+    fontSize: '16px',
+  },
+  groupTitleCell: {
+    maxWidth: '100px',
+    textOverflow : 'ellipsis',
+    overflow : 'hidden',
+    fontSize: '16px',
+  },
+  titleCell: {
+    maxWidth: '200px',
+    textOverflow : 'ellipsis',
+    overflow : 'hidden',
+    fontSize: '16px',
+  },
+  selectCell: {
+    maxWidth: '70px'
+  }
+});
 
-export class ChannelTableRow extends Component {
+class ChannelTableRow extends Component {
   constructor(props){
     super(props);
     this.state = {
@@ -63,24 +88,25 @@ export class ChannelTableRow extends Component {
   };
   
   render() {
+    const {classes} = this.props;
     const channel = this.props.channel;
     const channelAttrs = channel.attributes;
     
     return (
-      <TableRow>
-        <TableCell>
+      <TableRow className={classes.row}>
+        <TableCell className={classes.selectCell}>
           <CheckBox color="primary" onClick={this.handleSelectChannel} checked={channel.selected}/>
         </TableCell>
-        <TableCell>
+        <TableCell className={classes.titleCell}>
           <Grid container direction="row" justify="flex-start" alignItems="center">
             {channelAttrs.tvgLogoPath && <img className="tvg-logo" src={channelAttrs.tvgLogoPath} alt="logo"/>}
             {channel.title}
           </Grid>
         </TableCell>
-        <TableCell>
+        <TableCell className={classes.groupTitleCell}>
           {!channel.groupTitle ? 'Неизвестно' : channel.groupTitle}
         </TableCell>
-        <TableCell>
+        <TableCell className={classes.pathCell}>
            {channel.path}
         </TableCell>
         <TableCell>
@@ -112,3 +138,9 @@ export class ChannelTableRow extends Component {
     );
   }
 }
+
+ChannelTableRow.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(channelTableRowStyles)(ChannelTableRow);
