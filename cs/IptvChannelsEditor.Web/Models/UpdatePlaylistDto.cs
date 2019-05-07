@@ -9,5 +9,7 @@ namespace IptvChannelsEditor.Web.Models
         public string Name { get; set; }
         [Required]
         public Channel[] Channels { get; set; }
+        [Required]
+        public int NextChannelNumber { get; set; }
     }
 }

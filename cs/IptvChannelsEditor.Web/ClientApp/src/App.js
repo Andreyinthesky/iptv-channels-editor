@@ -134,8 +134,11 @@ class App extends Component {
 
   handleInsertChannel = channelIndex => {
     let newChannel = getDefaultChannel();
-    newChannel.id = this.state.channels.length;
+    newChannel.id = this.nextChannelNumber;
     newChannel.title += newChannel.id;
+    this.nextChannelNumber++;
+    console.log(this.nextChannelNumber);
+    
     const channels = this.state.channels.slice();
     channels.splice(channelIndex, 0, newChannel);
     this.setState({channels: channels, allChangesSaved: false});
@@ -183,6 +186,7 @@ class App extends Component {
     const playlistToFetch = {};
     playlistToFetch.channels = this.state.channels;
     playlistToFetch.name = this.state.playlistName;
+    playlistToFetch.nextChannelNumber = this.nextChannelNumber;
     
     fetch(`api/playlist/${this.playlistId}`, {
       method: 'PATCH',
@@ -221,6 +225,7 @@ class App extends Component {
     });
     
     this.playlistId = playlist.id;
+    this.nextChannelNumber = playlist.nextChannelNumber;
     this.setState({loading: false, playlistName: playlist.name, channels: playlist.channels});
   };
   
