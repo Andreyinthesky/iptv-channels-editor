@@ -141,6 +141,20 @@ class App extends Component {
     this.setState({channels: channels, allChangesSaved: false});
   };
   
+  handleSwapChannels = (firstChannelIndex, secondChannelIndex) => {
+    const newChannels = this.state.channels.slice();
+    
+    if (firstChannelIndex < 0 || firstChannelIndex >= newChannels.length
+      || secondChannelIndex < 0 || secondChannelIndex >= newChannels.length)
+      return;
+    
+    const tempChannel = newChannels[firstChannelIndex];
+    newChannels[firstChannelIndex] = newChannels[secondChannelIndex];
+    newChannels[secondChannelIndex] = tempChannel;
+    
+    this.setState({channels: newChannels, allChangesSaved: false});
+  };
+  
   handleChangeChannel = (index, channel) => {
     if (!channel)
       return;
@@ -267,6 +281,7 @@ class App extends Component {
               onSelectChannel={this.handleSelectChannel}
               onInsertChannel={this.handleInsertChannel}
               onChangeChannel={this.handleChangeChannel}
+              onSwapChannels={this.handleSwapChannels}
             />
             <div className={classes.downloadButtonDiv}>
               <Button 

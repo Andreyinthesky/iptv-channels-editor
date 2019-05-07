@@ -53,11 +53,13 @@ export class ChannelTableRow extends Component {
   };
   
   handleMoveUpChannel = () => {
-    console.log("up");  
+    const channelIndex = this.props.index;
+    this.props.onSwapChannels(channelIndex, channelIndex - 1);
   };
 
   handleMoveDownChannel = () => {
-    console.log("down");
+    const channelIndex = this.props.index;
+    this.props.onSwapChannels(channelIndex, channelIndex + 1);
   };
   
   render() {

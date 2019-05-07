@@ -82,14 +82,14 @@ export class ChannelTable extends Component {
         <Divider/>
         <Table>
           <TableHead>
-          {channels.filter(ch => ch !== undefined).length > 0 && 
-          <TableRow>
-            <TableCell>Выбрать</TableCell>
-            <TableCell>Имя</TableCell>
-            <TableCell>Группа</TableCell>
-            <TableCell>Адрес</TableCell>
-            <TableCell>Действия</TableCell>
-          </TableRow>}
+            {channels.filter(ch => ch !== undefined).length > 0 && 
+            <TableRow>
+              <TableCell>Выбрать</TableCell>
+              <TableCell>Имя</TableCell>
+              <TableCell>Группа</TableCell>
+              <TableCell>Адрес</TableCell>
+              <TableCell>Действия</TableCell>
+            </TableRow>}
           </TableHead>
           <TableBody>
           {channels.slice(curPage * rowsPerPage, curPage * rowsPerPage + rowsPerPage)
@@ -100,6 +100,7 @@ export class ChannelTable extends Component {
               onEditChannel={this.props.onEditChannel}
               onInsertChannel={this.props.onInsertChannel}
               onSelectChannel={this.props.onSelectChannel}
+              onSwapChannels={this.props.onSwapChannels}
             />
           )}
           </TableBody>

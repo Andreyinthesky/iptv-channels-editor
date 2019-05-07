@@ -35,6 +35,7 @@ export default class Channels extends Component {
           onEditChannel={this.handleEditChannel}
           onInsertChannel={this.handleInsertChannel}
           onSelectChannel={this.handleSelectChannel}
+          onSwapChannels={this.props.onSwapChannels}
         />
         {this.state.channelIndexForEdit >= 0 && 
         <EditChannelForm
