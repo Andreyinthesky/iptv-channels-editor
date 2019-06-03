@@ -15,7 +15,8 @@ export default class AppBarMain extends React.Component {
     super(props);
     
     this.handleSavePlaylist = this.props.onSavePlaylist;
-    
+    this.handleUndoAction = this.props.onUndoAction;
+    this.handleRedoAction = this.props.onRedoAction;
   }
 
   render() {
@@ -32,12 +33,12 @@ export default class AppBarMain extends React.Component {
             {allChangesSaved ? 'Все изменения сохранены' : 'Есть несохраненные изменения'}
           </Typography>
           <Tooltip title={'Отменить'}>
-            <IconButton onClick={() => console.log("undo")} size="medium" color='inherit'>
+            <IconButton onClick={this.handleUndoAction} size="medium" color='inherit'>
               <UndoIcon />
             </IconButton>
           </Tooltip>
           <Tooltip title={'Повторить'}>
-            <IconButton onClick={() => console.log("redo")} size="small" color='inherit'>
+            <IconButton onClick={this.handleRedoAction} size="small" color='inherit'>
               <RedoIcon />
             </IconButton>
           </Tooltip>

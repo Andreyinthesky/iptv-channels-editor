@@ -9,12 +9,14 @@ import Paper from '@material-ui/core/Paper';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import EditIcon from '@material-ui/icons/Edit';
 import DoneIcon from '@material-ui/icons/Done';
+import AddIcon from '@material-ui/icons/Add';
 import {getDefaultChannel} from "./helpers/playlistHelpers";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import EditPlaylistNameForm from "./components/EditPlaylistNameForm";
 import lightGreen from '@material-ui/core/colors/lightGreen';
 import MainForm from "./components/MainForm";
+import Fab from "@material-ui/core/Fab";
 
 
 const appStyles = theme => ({
@@ -24,7 +26,7 @@ const appStyles = theme => ({
     paddingBottom: theme.spacing.unit * 2,
     marginLeft: theme.spacing.unit * 9,
     marginTop: theme.spacing.unit * 9,
-    marginRight: theme.spacing.unit * 9,
+    marginRight: theme.spacing.unit * 20,
     minWidth: '800px',
   },
   forSelectedBar: {
@@ -68,6 +70,16 @@ const appStyles = theme => ({
     marginRight: theme.spacing.unit * 2,
     textDecoration: 'underline',
   },
+  addButton: {
+    position: 'absolute',
+    bottom: theme.spacing.unit * 2,
+    right: theme.spacing.unit * 2,
+    color: theme.palette.common.white,
+    backgroundColor: lightGreen['A400'],
+    '&:hover': {
+      backgroundColor: lightGreen['A700'],
+    }
+  },
   downloadButtonDiv: {
     display: 'flex',
     flexDirection: 'row-reverse',
@@ -90,6 +102,9 @@ class App extends Component {
 
   constructor(props) {
     super(props);
+    
+    this.doStack = [];
+    this.undoStack = [];
 
     this.state = {
       loading: true,
@@ -109,7 +124,9 @@ class App extends Component {
       if (channels[i] && !channels[i].selected)
         newChannels.push(channels[i]);
     }
-    this.setState({channels: newChannels, selectedChannelsCount : 0, allChangesSaved: false});
+    this.setState({channels: newChannels, selectedChannelsCount : 0, allChangesSaved: false}, () => {
+      this.savePlaylistSnapshot();
+    });
   };
 
   handleSelectChannel = channelIndex => {
@@ -141,7 +158,9 @@ class App extends Component {
     
     const channels = this.state.channels.slice();
     channels.splice(channelIndex, 0, newChannel);
-    this.setState({channels: channels, allChangesSaved: false});
+    this.setState({channels: channels, allChangesSaved: false}, () => {
+      this.savePlaylistSnapshot();
+    });
   };
   
   handleSwapChannels = (firstChannelIndex, secondChannelIndex) => {
@@ -155,7 +174,9 @@ class App extends Component {
     newChannels[firstChannelIndex] = newChannels[secondChannelIndex];
     newChannels[secondChannelIndex] = tempChannel;
     
-    this.setState({channels: newChannels, allChangesSaved: false});
+    this.setState({channels: newChannels, allChangesSaved: false}, () => {
+      this.savePlaylistSnapshot();
+    });
   };
   
   handleChangeChannel = (index, channel) => {
@@ -164,7 +185,9 @@ class App extends Component {
     console.log(channel);
     const newChannels = this.state.channels.slice();
     newChannels[index] = channel;
-    this.setState({channels: newChannels, allChangesSaved: false});
+    this.setState({channels: newChannels, allChangesSaved: false}, () => {
+      this.savePlaylistSnapshot();
+    });
   };
 
   handleClickEditPlaylistNameButton = () => {
@@ -176,7 +199,9 @@ class App extends Component {
       if (!newPlaylistName || newPlaylistName === this.state.playlistName)
         return;
 
-      this.setState({playlistName: newPlaylistName, allChangesSaved: false});
+      this.setState({playlistName: newPlaylistName, allChangesSaved: false}, () => {
+        this.savePlaylistSnapshot();
+      });
     });
   };
   
@@ -226,7 +251,47 @@ class App extends Component {
     
     this.playlistId = playlist.id;
     this.nextChannelNumber = playlist.nextChannelNumber;
-    this.setState({loading: false, playlistName: playlist.name, channels: playlist.channels});
+    this.setState({loading: false, playlistName: playlist.name, channels: playlist.channels}, () => {
+      this.doStack.push({playlistName: playlist.name, channels: playlist.channels});
+    });
+  };
+  
+  savePlaylistSnapshot = () => {
+    const snapshot = {
+      playlistName: this.state.playlistName,
+      channels: this.state.channels,  
+    };
+    
+    this.undoStack = [];
+    this.doStack.push(snapshot);
+  };
+  
+  undoAction = () => {
+    if (this.doStack.length <= 1)
+      return;
+
+    this.undoStack.push(this.doStack.pop());
+    const snapshot = this.doStack[this.doStack.length - 1];
+    
+    this.setState({
+      playlistName : snapshot.playlistName,
+      channels: snapshot.channels,
+      allChangesSaved: false
+    });
+  };
+  
+  redoAction = () => {
+    if (this.undoStack.length === 0)
+      return;
+    
+    const snapshot = this.undoStack.pop();
+    this.setState({
+      playlistName : snapshot.playlistName, 
+      channels: snapshot.channels,
+      allChangesSaved: false
+    }, () => {
+      this.doStack.push(snapshot);
+    });
   };
   
   render() {
@@ -240,20 +305,22 @@ class App extends Component {
     
     return (
       <div className={classes.root}>
-          {!this.state.selectedChannelsCount > 0 ? 
-            <AppBarMain 
-              classes={classes}
-              onSavePlaylist={this.handleSavePlaylist}
-              allChangesSaved={this.state.allChangesSaved}
-            />
-            :
-            <AppBarForSelected 
-              classes={classes}
-              selectedChannelsCount={this.state.selectedChannelsCount}
-              onDeleteSelectedChannels={this.handleDeleteSelectedChannels} 
-              onSelectAllChannels={this.handleSelectAllChannels}
-            />
-          }
+        {!this.state.selectedChannelsCount > 0 ? 
+          <AppBarMain 
+            classes={classes}
+            allChangesSaved={this.state.allChangesSaved}
+            onSavePlaylist={this.handleSavePlaylist}
+            onUndoAction={this.undoAction}
+            onRedoAction={this.redoAction}
+          />
+          :
+          <AppBarForSelected 
+            classes={classes}
+            selectedChannelsCount={this.state.selectedChannelsCount}
+            onDeleteSelectedChannels={this.handleDeleteSelectedChannels} 
+            onSelectAllChannels={this.handleSelectAllChannels}
+          />
+        }
         { !this.state.loading &&
           <Paper className={classes.paper} elevation={1} square={true}>
             <Grid container
@@ -302,6 +369,9 @@ class App extends Component {
             </div>
           </Paper>
         }
+        <Fab aria-label="Add" className={classes.addButton} size="medium">
+          <AddIcon />
+        </Fab>
       </div>
     );
   }
