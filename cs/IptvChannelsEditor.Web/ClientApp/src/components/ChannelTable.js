@@ -49,7 +49,7 @@ export class ChannelTable extends Component {
   };
   
   handleChangePage = (event, page) => {
-    this.setState({ curPage: page }, () => console.log(this.state.curPage));
+    this.setState({ curPage: page });
   };
 
   handleChangeRowsPerPage = (event) => {

@@ -4,6 +4,7 @@ import AppBarForSelected from './components/AppBarForSelected';
 import AppBarMain from "./components/AppBarMain";
 import PropTypes from 'prop-types';
 import withStyles from '@material-ui/core/styles/withStyles';
+import {getCookie, deleteCookie} from "./helpers/cookieHelpers";
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
@@ -16,7 +17,6 @@ import Grid from "@material-ui/core/Grid";
 import EditPlaylistNameForm from "./components/EditPlaylistNameForm";
 import lightGreen from '@material-ui/core/colors/lightGreen';
 import MainForm from "./components/MainForm";
-import Fab from "@material-ui/core/Fab";
 
 
 const appStyles = theme => ({
@@ -26,7 +26,8 @@ const appStyles = theme => ({
     paddingBottom: theme.spacing.unit * 2,
     marginLeft: theme.spacing.unit * 9,
     marginTop: theme.spacing.unit * 9,
-    marginRight: theme.spacing.unit * 20,
+    marginBottom: theme.spacing.unit * 9,
+    marginRight: theme.spacing.unit * 9,
     minWidth: '800px',
   },
   forSelectedBar: {
@@ -69,16 +70,6 @@ const appStyles = theme => ({
   allChangesSavedTitle: {
     marginRight: theme.spacing.unit * 2,
     textDecoration: 'underline',
-  },
-  addButton: {
-    position: 'absolute',
-    bottom: theme.spacing.unit * 2,
-    right: theme.spacing.unit * 2,
-    color: theme.palette.common.white,
-    backgroundColor: lightGreen['A400'],
-    '&:hover': {
-      backgroundColor: lightGreen['A700'],
-    }
   },
   downloadButtonDiv: {
     display: 'flex',
@@ -141,8 +132,6 @@ class App extends Component {
       return ch;
     });
     
-    console.log(newChannels);
-    
     this.setState({
       channels: newChannels,
       selectedChannelsCount: isSelect ? this.state.channels.length : 0,
@@ -154,7 +143,6 @@ class App extends Component {
     newChannel.id = this.nextChannelNumber;
     newChannel.title += newChannel.id;
     this.nextChannelNumber++;
-    console.log(this.nextChannelNumber);
     
     const channels = this.state.channels.slice();
     channels.splice(channelIndex, 0, newChannel);
@@ -182,7 +170,6 @@ class App extends Component {
   handleChangeChannel = (index, channel) => {
     if (!channel)
       return;
-    console.log(channel);
     const newChannels = this.state.channels.slice();
     newChannels[index] = channel;
     this.setState({channels: newChannels, allChangesSaved: false}, () => {
@@ -203,6 +190,11 @@ class App extends Component {
         this.savePlaylistSnapshot();
       });
     });
+  };
+
+  handleSwitchToMainForm = () => {
+    deleteCookie("currentPlaylistId");
+    this.setState({loading: true});
   };
   
   handleSavePlaylist = (e) => {
@@ -230,6 +222,30 @@ class App extends Component {
       }
     })
     .catch(error => console.error('Network error:', error));
+  };
+
+  loadPlaylistById = (id) => {
+    if (!id)
+      return;
+    
+    fetch(`api/playlist/get/${id}`)
+      .then(response => {
+        if (response.status !== 200) {
+          if (response.status === 404) {
+            deleteCookie("currentPlaylistId");
+            this.forceUpdate();
+          }
+          return undefined;
+        }
+        return response.json();
+      })
+      .then(playlist => {
+        if(!playlist)
+          return;
+        
+        this.loadPlaylist(playlist)
+      })
+      .catch(error => console.error('Error:', error));
   };
   
   loadSampleChannels = () => {
@@ -296,9 +312,14 @@ class App extends Component {
   
   render() {
     if (this.state.loading) {
-      // return (
-      //   <MainForm onUpload={this.loadPlaylist} />);
-      this.loadSampleChannels();
+      const currentPlaylistId = getCookie("currentPlaylistId");
+      
+      if (!currentPlaylistId)
+        return <MainForm onUpload={this.loadPlaylist} />;
+      
+      this.loadPlaylistById(currentPlaylistId);
+      return null;
+      // this.loadSampleChannels();
     }
     
     const {classes} = this.props;
@@ -312,6 +333,7 @@ class App extends Component {
             onSavePlaylist={this.handleSavePlaylist}
             onUndoAction={this.undoAction}
             onRedoAction={this.redoAction}
+            onSwitchToMainForm={this.handleSwitchToMainForm}
           />
           :
           <AppBarForSelected 
@@ -369,9 +391,6 @@ class App extends Component {
             </div>
           </Paper>
         }
-        <Fab aria-label="Add" className={classes.addButton} size="medium">
-          <AddIcon />
-        </Fab>
       </div>
     );
   }

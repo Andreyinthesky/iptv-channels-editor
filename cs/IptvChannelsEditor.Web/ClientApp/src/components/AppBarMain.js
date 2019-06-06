@@ -17,6 +17,7 @@ export default class AppBarMain extends React.Component {
     this.handleSavePlaylist = this.props.onSavePlaylist;
     this.handleUndoAction = this.props.onUndoAction;
     this.handleRedoAction = this.props.onRedoAction;
+    this.handleSwitchToMainForm = this.props.onSwitchToMainForm;
   }
 
   render() {
@@ -42,7 +43,7 @@ export default class AppBarMain extends React.Component {
               <RedoIcon />
             </IconButton>
           </Tooltip>
-          <Button onClick={() => console.log("load")} variant="contained" size="large" className={classes.largeButton}>
+          <Button onClick={this.handleSwitchToMainForm} variant="contained" size="large" className={classes.largeButton}>
             Загрузить новый
           </Button>
           <Button onClick={this.handleSavePlaylist} variant="contained" size="large" color={"secondary"}

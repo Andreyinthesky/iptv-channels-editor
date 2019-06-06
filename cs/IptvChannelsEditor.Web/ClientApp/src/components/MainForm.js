@@ -7,6 +7,7 @@ import Grid from "@material-ui/core/Grid";
 import FormControl from "@material-ui/core/FormControl";
 import InputBase from "@material-ui/core/InputBase";
 import CircularProgress from '@material-ui/core/CircularProgress';
+import {setCookie} from "../helpers/cookieHelpers";
 
 const mainFormStyles = theme => ({
   welcomeAppIcon: {
@@ -88,8 +89,9 @@ class MainForm extends React.Component {
           return response.json();
         })
         .then(playlist => {
-          if (!playlist || playlist.channels === undefined)
+          if (!playlist || !playlist.channels || !playlist.id)
             return;
+          setCookie("currentPlaylistId", playlist.id, {expires: 1000});
           this.props.onUpload(playlist);
         })
         .catch(error => console.error('Error:', error));

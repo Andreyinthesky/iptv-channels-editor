@@ -47,6 +47,19 @@ namespace IptvChannelsEditor.Web.Controllers
         }
 
         [HttpGet("[action]/{playlistId}")]
+        public IActionResult Get([FromRoute]Guid playlistId)
+        {         
+            var playlistEntity = repository.FindById(playlistId);
+            
+            if (playlistEntity == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(playlistEntity);
+        }
+        
+        [HttpGet("[action]/{playlistId}")]
         public IActionResult Download([FromRoute]Guid playlistId)
         {         
             var playlist = repository.FindById(playlistId);
