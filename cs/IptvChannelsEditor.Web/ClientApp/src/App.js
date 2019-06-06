@@ -94,9 +94,6 @@ class App extends Component {
   constructor(props) {
     super(props);
     
-    this.doStack = [];
-    this.undoStack = [];
-
     this.state = {
       loading: true,
       selectedChannelsCount: 0,
@@ -248,6 +245,20 @@ class App extends Component {
       .catch(error => console.error('Error:', error));
   };
   
+  checkChannel = channel => {
+    // if (!channel.path)
+    //   return;
+    //
+    // fetch(`api/channel/check?path=${channel.path}`)
+    //   .then(response => {
+    //     return response.json();
+    //   })
+    //   .then(verdict => {
+    //     console.log(channel.title + " : " + verdict);
+    //   })
+    //   .catch(error => console.error('Error:', error));
+  };
+  
   loadSampleChannels = () => {
     fetch('api/sampleChannels')
       .then(response => response.json())
@@ -268,6 +279,8 @@ class App extends Component {
     this.playlistId = playlist.id;
     this.nextChannelNumber = playlist.nextChannelNumber;
     this.setState({loading: false, playlistName: playlist.name, channels: playlist.channels}, () => {
+      this.doStack = [];
+      this.undoStack = [];
       this.doStack.push({playlistName: playlist.name, channels: playlist.channels});
     });
   };
@@ -376,6 +389,7 @@ class App extends Component {
               onInsertChannel={this.handleInsertChannel}
               onChangeChannel={this.handleChangeChannel}
               onSwapChannels={this.handleSwapChannels}
+              onCheckChannel={this.checkChannel}
             />
             <div className={classes.downloadButtonDiv}>
               <Button 
