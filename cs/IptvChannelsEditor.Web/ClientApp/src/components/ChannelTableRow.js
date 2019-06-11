@@ -47,8 +47,6 @@ const channelTableRowStyles = theme => ({
 class ChannelTableRow extends Component {
 
   handleSelectChannel = () => {
-    let channel = this.props.channel;
-    channel.selected = !channel.selected;
     this.props.onSelectChannel(this.props.index);
   };
   

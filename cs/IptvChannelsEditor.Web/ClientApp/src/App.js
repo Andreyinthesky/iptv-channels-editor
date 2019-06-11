@@ -123,11 +123,14 @@ class App extends Component {
       this.savePlaylistSnapshot();
     });
   };
-
-  //TODO setstate
+  
   handleSelectChannel = channelIndex => {
-    let delta = this.state.channels[channelIndex].selected ? 1 : -1;
-    this.setState({selectedChannelsCount: this.state.selectedChannelsCount + delta});
+    const newChannels = this.state.channels.slice();
+    const channel = Object.assign({}, newChannels[channelIndex]);
+    channel.selected = !channel.selected;
+    newChannels[channelIndex] = channel;
+    let delta = channel.selected ? 1 : -1;
+    this.setState({selectedChannelsCount: this.state.selectedChannelsCount + delta, channels: newChannels});
   };
   
   handleSelectAllChannels = () => {
@@ -316,9 +319,11 @@ class App extends Component {
   };
   
   savePlaylistSnapshot = () => {
-    const channels = this.state.channels.slice().map(ch => {
-      ch.selected = false;
-      return ch;
+    const channels = this.state.channels.slice()
+      .map(ch => {
+        let newChannel = Object.assign({}, ch);
+        newChannel.selected = false;
+        return newChannel;
     });
     
     const snapshot = {
