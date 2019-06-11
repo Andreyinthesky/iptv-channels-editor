@@ -212,6 +212,9 @@ class App extends Component {
   };
   
   handleSavePlaylist = (e) => {
+    if (this.state.allChangesSaved)
+      return Promise.resolve();
+    
     this.setState({allChangesSaved: true});
     
     const playlistToFetch = {};
@@ -219,7 +222,7 @@ class App extends Component {
     playlistToFetch.name = this.state.playlistName;
     playlistToFetch.nextChannelNumber = this.nextChannelNumber;
     
-    fetch(`api/playlist/${this.playlistId}`, {
+    return fetch(`api/playlist/${this.playlistId}`, {
       method: 'PATCH',
       headers: {
         "Content-Type": "application/json",
@@ -239,6 +242,15 @@ class App extends Component {
       console.error('Network error:', error);
       this.setState({allChangesSaved: false});
     });
+  };
+  
+  handleDownloadPlaylist = () => {
+    this.handleSavePlaylist()
+      .then(() => {
+        let anchor = document.createElement('a');
+        anchor.setAttribute('href', `api/playlist/download/${this.playlistId}`);
+        anchor.click();
+      });
   };
 
   handleCheckSelectedChannels = () => {
@@ -363,7 +375,6 @@ class App extends Component {
     });
   };
   
-  //TODO Add auto-save before downloading
   render() {
     if (this.state.loading) {
       const currentPlaylistId = getCookie("currentPlaylistId");
@@ -444,7 +455,7 @@ class App extends Component {
                 size="large"
                 color={"default"}
                 className={classes.downloadButton}
-                href={`api/playlist/download/${this.playlistId}`}
+                onClick={this.handleDownloadPlaylist}
               >
                 <SaveAltIcon className={classes.leftIcon} />
                 Скачать
