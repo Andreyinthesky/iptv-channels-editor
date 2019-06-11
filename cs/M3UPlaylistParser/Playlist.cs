@@ -22,12 +22,9 @@ namespace M3UPlaylistParser
             return Parse(File.ReadAllLines(filePath));
         }
         
-        public static Playlist Parse(Stream stream)
+        public static Playlist Parse(StreamReader streamReader)
         {
-            using (var streamReader = new StreamReader(stream))
-            {
-                return Parse(streamReader.ReadAllLines());
-            }
+            return Parse(streamReader.ReadAllLines());
         }
 
         private static Playlist Parse(IEnumerable<string> lines)

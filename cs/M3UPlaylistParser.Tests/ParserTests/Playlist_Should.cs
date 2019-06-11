@@ -19,7 +19,7 @@ namespace M3UPlaylistParser.Tests.ParserTests
                 var bytes = Encoding.UTF8.GetBytes("#EXTM3U");
                 stream.Write(bytes);
                 stream.Position = 0;
-                var playlist = Playlist.Parse(stream);
+                var playlist = Playlist.Parse(new StreamReader(stream));
                 
                 playlist.Items.Should().BeEmpty();
             }
@@ -40,7 +40,7 @@ namespace M3UPlaylistParser.Tests.ParserTests
                 stream.Write(bytes);
                 stream.Position = 0;
                 
-                var playlist = Playlist.Parse(stream);
+                var playlist = Playlist.Parse(new StreamReader(stream));
 
                 playlist.Items.Count().Should().Be(1);
                 playlist.Items.First().Should().BeEquivalentTo(expectedItem);
@@ -70,7 +70,7 @@ namespace M3UPlaylistParser.Tests.ParserTests
                 var bytes = Encoding.UTF8.GetBytes(m3u);
                 stream.Write(bytes);
                 stream.Position = 0;
-                var playlist = Playlist.Parse(stream);
+                var playlist = Playlist.Parse(new StreamReader(stream));
                 
                 playlist.Items.Should().BeEquivalentTo(expectedItems);
             }
@@ -94,7 +94,7 @@ namespace M3UPlaylistParser.Tests.ParserTests
                 stream.Write(bytes);
                 stream.Position = 0;
                 
-                Action act = () => Playlist.Parse(stream);
+                Action act = () => Playlist.Parse(new StreamReader(stream));
 
                 act.Should().NotThrow();
             }

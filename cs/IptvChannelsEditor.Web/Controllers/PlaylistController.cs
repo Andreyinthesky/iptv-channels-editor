@@ -36,7 +36,7 @@ namespace IptvChannelsEditor.Web.Controllers
             Playlist playlist;
             using (var fileStream = file.OpenReadStream())
             {   
-                playlist = Playlist.Parse(fileStream);
+                playlist = Playlist.Parse(new StreamReader(fileStream));
             }
 
             var playlistEntity = Mapper.Map<Playlist, PlaylistEntity>(playlist);
