@@ -208,7 +208,6 @@ class App extends Component {
     this.setState({loading: true});
   };
   
-  //TODO setstate -> false when catch
   handleSavePlaylist = (e) => {
     this.setState({allChangesSaved: true});
     
@@ -233,7 +232,10 @@ class App extends Component {
         this.setState({allChangesSaved: false});
       }
     })
-    .catch(error => console.error('Network error:', error));
+    .catch(error => {
+      console.error('Network error:', error);
+      this.setState({allChangesSaved: false});
+    });
   };
 
   handleCheckSelectedChannels = () => {
