@@ -4,11 +4,12 @@ import AppBar from "@material-ui/core/AppBar";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import DeleteIcon from '@material-ui/icons/Delete';
+import DoneAllIcon from '@material-ui/icons/DoneAll';
 import PropTypes from "prop-types";
 
 export default function AppBarForSelected(props) {
   const {selectedChannelsCount, classes} = props;
-  const {onDeleteSelectedChannels, onSelectAllChannels} = props;
+  const {onDeleteSelectedChannels, onSelectAllChannels, onCheckSelectedChannels} = props;
   
   return (
     <AppBar position="fixed" className={classes.forSelectedBar}>
@@ -19,6 +20,11 @@ export default function AppBarForSelected(props) {
         <Button variant="contained" size="large" className={classes.largeButton}
                 onClick={onSelectAllChannels}>
           Выбрать все
+        </Button>
+        <Button variant="contained" size="large" className={classes.largeButton}
+                onClick={onCheckSelectedChannels}>
+          <DoneAllIcon className={classes.leftIcon}/>
+          Проверить выбранные
         </Button>
         <Button variant="contained" size="large" className={classes.largeButton}
                 onClick={onDeleteSelectedChannels}>

@@ -8,45 +8,15 @@ import TableCell from '@material-ui/core/TableCell';
 import TablePagination from "@material-ui/core/TablePagination";
 import Divider from "@material-ui/core/Divider";
 
-export class ChannelTable extends Component {
-  
+
+export default class ChannelTable extends Component {
   constructor(props){
     super(props);
-    this.selected = [];
     this.state = {
       rowsPerPage: 5,
       curPage: 0,
     };
   }
-
-  handleSelectAll = event => {
-    if (event.target.checked) {
-      this.setState(state => ({ selected: state.data.map(n => n.id) }));
-      return;
-    }
-    this.setState({ selected: [] });
-  };
-
-  handleSelect = (event, id) => {
-    const { selected } = this.state;
-    const selectedIndex = selected.indexOf(id);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      );
-    }
-
-    this.setState({ selected: newSelected });
-  };
   
   handleChangePage = (event, page) => {
     this.setState({ curPage: page });
@@ -56,8 +26,9 @@ export class ChannelTable extends Component {
     this.setState({ rowsPerPage: event.target.value });
   };
   
+  //TODO: add HOC on table pagination (jump to start/end)
   render() {
-    const channels = this.props.channels;
+    const {channels} = this.props;
     const {rowsPerPage, curPage} = this.state;
     
     return (
@@ -82,26 +53,31 @@ export class ChannelTable extends Component {
         <Divider/>
         <Table>
           <TableHead>
-            {channels.filter(ch => ch !== undefined).length > 0 && 
-            <TableRow>
-              <TableCell>Выбрать</TableCell>
-              <TableCell>Имя</TableCell>
-              <TableCell>Группа</TableCell>
-              <TableCell>Адрес</TableCell>
-              <TableCell>Действия</TableCell>
-            </TableRow>}
+            {
+              channels.filter(ch => ch !== undefined).length > 0 && 
+              <TableRow>
+                <TableCell>№</TableCell>
+                <TableCell>Выбрать</TableCell>
+                <TableCell>Имя</TableCell>
+                <TableCell>Группа</TableCell>
+                <TableCell>Адрес</TableCell>
+                <TableCell>Действия</TableCell>
+              </TableRow>
+            }
           </TableHead>
           <TableBody>
           {channels.slice(curPage * rowsPerPage, curPage * rowsPerPage + rowsPerPage)
-            .map((channel, index) =>
-            channel && <ChannelTableRow key={channel.id}
-              index = {curPage * rowsPerPage + index}                          
-              channel = {channel}
-              onEditChannel={this.props.onEditChannel}
-              onInsertChannel={this.props.onInsertChannel}
-              onSelectChannel={this.props.onSelectChannel}
-              onSwapChannels={this.props.onSwapChannels}
-            />
+            .map((channel, index) => channel && 
+              <ChannelTableRow 
+                key={channel.id}
+                index = {curPage * rowsPerPage + index}                          
+                channel = {channel}
+                onEditChannel={this.props.onEditChannel}
+                onInsertChannel={this.props.onInsertChannel}
+                onSelectChannel={this.props.onSelectChannel}
+                onSwapChannels={this.props.onSwapChannels} 
+                onCheckChannel={this.props.onCheckChannel}
+              />
           )}
           </TableBody>
         </Table>

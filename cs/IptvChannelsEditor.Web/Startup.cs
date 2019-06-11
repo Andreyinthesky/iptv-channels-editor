@@ -1,4 +1,5 @@
 using AutoMapper;
+using IptvChannelsEditor.Tools;
 using IptvChannelsEditor.Web.Domain;
 using IptvChannelsEditor.Web.Models;
 using IptvChannelsEditor.Web.Models.Entities;
@@ -39,6 +40,7 @@ namespace IptvChannelsEditor.Web
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/build"; });
             services.AddSingleton<IMongoDatabaseProvider, IptvChannelsEditorMongoDatabase>();
             services.AddSingleton<IPlaylistRepository, MongoPlaylistRepository>();
+            services.AddSingleton<IChannelChecker, ChannelChecker>();
             
             Mapper.Initialize(cfg =>
             {
@@ -74,6 +76,13 @@ namespace IptvChannelsEditor.Web
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = "ClientApp";
+                spa.Options.DefaultPageStaticFileOptions = new StaticFileOptions
+                {
+                    OnPrepareResponse = context =>
+                    {
+                        context.Context.Response.Headers.Add("Cache-Control", "public,max-age=6000");
+                    }
+                };
 
                 if (env.IsDevelopment())
                 {

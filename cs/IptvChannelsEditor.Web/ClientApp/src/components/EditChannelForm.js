@@ -54,12 +54,12 @@ class EditChannelForm extends React.Component {
   };
 
   handleChange = (event, channelProp)=> {
-    const newChannel = {};
-    Object.assign(newChannel, this.state.channel);
+    const newChannel = Object.assign({}, this.state.channel);
     newChannel[channelProp] = event.target.value;
     this.setState({ channel: newChannel});
   };
 
+  //TODO: Add logoPath field
   render() {
     const { classes } = this.props;
     const channel = this.state.channel;
@@ -88,7 +88,7 @@ class EditChannelForm extends React.Component {
               </InputLabel>
               <OutlinedInput
                 id='title'
-                value={title}
+                value={title ? title : undefined}
                 onChange={e => this.handleChange(e, 'title')}
                 labelWidth={this.titleRef ? this.titleRef.offsetWidth : 0}
               >
@@ -103,7 +103,7 @@ class EditChannelForm extends React.Component {
               </InputLabel>
               <OutlinedInput
                 id='group'
-                value={groupTitle}
+                value={groupTitle ? groupTitle : undefined}
                 onChange={e => this.handleChange(e, 'groupTitle')}
                 labelWidth={this.groupRef ? this.groupRef.offsetWidth : 0}
               >
@@ -118,7 +118,7 @@ class EditChannelForm extends React.Component {
               </InputLabel>
               <OutlinedInput
                 id='path'
-                value={path}
+                value={path ? path : undefined}
                 onChange={e => this.handleChange(e, 'path')}
                 labelWidth={this.pathRef ? this.pathRef.offsetWidth : 0}
               >

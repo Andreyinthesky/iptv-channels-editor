@@ -9,8 +9,6 @@ import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import EditIcon from '@material-ui/icons/Edit';
-import DoneIcon from '@material-ui/icons/Done';
-import AddIcon from '@material-ui/icons/Add';
 import {getDefaultChannel} from "./helpers/playlistHelpers";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
@@ -20,14 +18,20 @@ import MainForm from "./components/MainForm";
 
 
 const appStyles = theme => ({
+  '@global': {
+    body: {
+      backgroundColor: theme.palette.primary.main,
+      margin: '0px',
+    },
+  },
   paper: {
     ...theme.mixins.gutters(),
-    paddingTop: theme.spacing.unit * 2,
-    paddingBottom: theme.spacing.unit * 2,
-    marginLeft: theme.spacing.unit * 9,
     marginTop: theme.spacing.unit * 9,
     marginBottom: theme.spacing.unit * 9,
-    marginRight: theme.spacing.unit * 9,
+    marginLeft: theme.spacing.unit * 1,
+    marginRight: theme.spacing.unit * 1,
+    paddingTop: theme.spacing.unit * 2,
+    paddingBottom: theme.spacing.unit * 2,
     minWidth: '800px',
   },
   forSelectedBar: {
@@ -52,10 +56,7 @@ const appStyles = theme => ({
     borderRadius: '20px',
   },
   playlistName: {
-    maxWidth: '400px',
-    textOverflow : 'ellipsis',
-    overflow : 'hidden',
-    display: 'inline-block',
+    maxWidth: '650px',
   },
   leftIcon: {
     marginRight: theme.spacing.unit,
@@ -84,6 +85,12 @@ const appStyles = theme => ({
     backgroundColor: lightGreen['A400'],
     '&:hover': {
       backgroundColor: lightGreen['A700'],
+    }
+  },
+  '@media (min-width: 1280px)': {
+    paper: {
+      marginLeft: theme.spacing.unit * 9,
+      marginRight: theme.spacing.unit * 9,
     }
   }
 });
@@ -117,6 +124,7 @@ class App extends Component {
     });
   };
 
+  //TODO setstate
   handleSelectChannel = channelIndex => {
     let delta = this.state.channels[channelIndex].selected ? 1 : -1;
     this.setState({selectedChannelsCount: this.state.selectedChannelsCount + delta});
@@ -168,9 +176,15 @@ class App extends Component {
     if (!channel)
       return;
     const newChannels = this.state.channels.slice();
+    if (channel.path !== newChannels[index].path && channel.available !== undefined)
+      channel.available = undefined;
     newChannels[index] = channel;
+    
+    console.log(channel);
+
     this.setState({channels: newChannels, allChangesSaved: false}, () => {
       this.savePlaylistSnapshot();
+      console.log(this.state.channels);
     });
   };
 
@@ -194,6 +208,7 @@ class App extends Component {
     this.setState({loading: true});
   };
   
+  //TODO setstate -> false when catch
   handleSavePlaylist = (e) => {
     this.setState({allChangesSaved: true});
     
@@ -221,6 +236,33 @@ class App extends Component {
     .catch(error => console.error('Network error:', error));
   };
 
+  handleCheckSelectedChannels = () => {
+    const newChannels = this.state.channels.slice();
+    
+    console.log('start check');
+    
+    for (let i = 0; i < newChannels.length; i++) {
+      if (newChannels[i] && newChannels[i].selected) {
+        let channel = newChannels[i];
+        let channelIndex = i;
+        
+        if (!channel.path || channel.available !== undefined)
+          continue;
+
+        fetch(`api/channel/check?path=${channel.path}`)
+          .then(response => {
+            return response.json();
+          })
+          .then(verdict => {
+            console.log(channel.title + " : " + verdict);
+            newChannels[channelIndex].available = verdict;
+            this.setState({channels: newChannels});
+          })
+          .catch(error => console.error('Error:', error));
+      }
+    }
+  };
+
   loadPlaylistById = (id) => {
     if (!id)
       return;
@@ -245,20 +287,6 @@ class App extends Component {
       .catch(error => console.error('Error:', error));
   };
   
-  checkChannel = channel => {
-    // if (!channel.path)
-    //   return;
-    //
-    // fetch(`api/channel/check?path=${channel.path}`)
-    //   .then(response => {
-    //     return response.json();
-    //   })
-    //   .then(verdict => {
-    //     console.log(channel.title + " : " + verdict);
-    //   })
-    //   .catch(error => console.error('Error:', error));
-  };
-  
   loadSampleChannels = () => {
     fetch('api/sampleChannels')
       .then(response => response.json())
@@ -281,14 +309,19 @@ class App extends Component {
     this.setState({loading: false, playlistName: playlist.name, channels: playlist.channels}, () => {
       this.doStack = [];
       this.undoStack = [];
-      this.doStack.push({playlistName: playlist.name, channels: playlist.channels});
+      this.doStack.push({playlistName: this.state.playlistName.slice(), channels: this.state.channels.slice()});
     });
   };
   
   savePlaylistSnapshot = () => {
+    const channels = this.state.channels.slice().map(ch => {
+      ch.selected = false;
+      return ch;
+    });
+    
     const snapshot = {
       playlistName: this.state.playlistName,
-      channels: this.state.channels,  
+      channels: channels,  
     };
     
     this.undoStack = [];
@@ -323,6 +356,7 @@ class App extends Component {
     });
   };
   
+  //TODO Add auto-save before downloading
   render() {
     if (this.state.loading) {
       const currentPlaylistId = getCookie("currentPlaylistId");
@@ -352,29 +386,35 @@ class App extends Component {
           <AppBarForSelected 
             classes={classes}
             selectedChannelsCount={this.state.selectedChannelsCount}
-            onDeleteSelectedChannels={this.handleDeleteSelectedChannels} 
+            onDeleteSelectedChannels={this.handleDeleteSelectedChannels}
+            onCheckSelectedChannels={this.handleCheckSelectedChannels}
             onSelectAllChannels={this.handleSelectAllChannels}
           />
         }
         { !this.state.loading &&
           <Paper className={classes.paper} elevation={1} square={true}>
-            <Grid container
-                  direction="row"
-                  justify="flex-start"
-                  alignItems="baseline"
+            <Grid 
+              container
+              direction="row"
+              justify="flex-start"
+              alignItems="baseline"
             >
-              <Typography variant='h3' paragraph={false} className={classes.playlistName}>
-                {this.state.playlistName}
+              <Typography variant='h3' inline={true} className={classes.playlistName}>
+                {
+                  this.state.playlistName.length > 27
+                  ? this.state.playlistName.substr(0, 24) + "..." 
+                  : this.state.playlistName
+                }
               </Typography>
-              <Button onClick={this.handleClickEditPlaylistNameButton}
-                      variant="outlined"
-                      size="small"
-                      aria-label="Edit" 
-                      className={classes.playlistToolbarIcon}
+              <Button 
+                onClick={this.handleClickEditPlaylistNameButton}
+                variant="outlined"
+                size="small"
+                aria-label="Edit" 
+                className={classes.playlistToolbarIcon}
               >
-                {this.state.isEdit ? 
-                  <DoneIcon className={classes.leftIcon} /> : <EditIcon className={classes.leftIcon} />}
-                  Изменить имя
+                <EditIcon className={classes.leftIcon} />
+                Изменить имя
               </Button>
             </Grid>
             { this.state.openEditPlaylistNameForm &&

@@ -7,41 +7,44 @@ import CheckBox from '@material-ui/core/Checkbox';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import EditIcon from '@material-ui/icons/Edit';
-import DoneIcon from '@material-ui/icons/Done';
-import CancelIcon from '@material-ui/icons/Cancel';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import {withStyles} from "@material-ui/core";
 import PropTypes from "prop-types";
 
 const channelTableRowStyles = theme => ({
+  tvgLogo: {
+    extend: 'img',
+    width: '50px',
+    marginRight: '20px',
+  },
   pathCell: {
-    maxWidth: '200px',
     textOverflow : 'ellipsis',
     overflow : 'hidden',
-    fontSize: '16px',
+    maxWidth: '200px',
   },
   groupTitleCell: {
-    maxWidth: '100px',
     textOverflow : 'ellipsis',
     overflow : 'hidden',
-    fontSize: '16px',
+    maxWidth: '100px',
   },
   titleCell: {
-    maxWidth: '200px',
     textOverflow : 'ellipsis',
     overflow : 'hidden',
-    fontSize: '16px',
+    maxWidth: '200px',
   },
   selectCell: {
-    maxWidth: '70px'
+    textOverflow : 'ellipsis',
+    overflow : 'hidden',
+  },
+  numberCell: {
+    fontSize: '20px',
+    fontWeight: 'bold',
+    color: theme.palette.primary.light,
   }
 });
 
 class ChannelTableRow extends Component {
-  constructor(props){
-    super(props);
-  }
 
   handleSelectChannel = () => {
     let channel = this.props.channel;
@@ -71,19 +74,37 @@ class ChannelTableRow extends Component {
     this.props.onSwapChannels(channelIndex, channelIndex + 1);
   };
   
+  handleCheckChannel = () => {
+    let {channel, index} = this.props;
+    this.props.onCheckChannel(channel, index);
+  };
+  
   render() {
-    const {classes} = this.props;
+    const {classes, index} = this.props;
     const channel = this.props.channel;
     const channelAttrs = channel.attributes;
-    
+
+    const CustomTableRow = withStyles(theme => ({
+      root: {
+        backgroundColor: channel.available === undefined 
+          ? undefined
+          : channel.available 
+            ? '#41dc38b3' : '#3b3f4eb3',
+        transition: '1.5s ease',
+      },
+    }))(TableRow);
+
     return (
-      <TableRow className={classes.row}>
+      <CustomTableRow>
+        <TableCell className={classes.numberCell}>
+          {index + 1}
+        </TableCell>
         <TableCell className={classes.selectCell}>
           <CheckBox color="primary" onClick={this.handleSelectChannel} checked={channel.selected}/>
         </TableCell>
         <TableCell className={classes.titleCell}>
           <Grid container direction="row" justify="flex-start" alignItems="center">
-            {channelAttrs.tvgLogoPath && <img className="tvg-logo" src={channelAttrs.tvgLogoPath} alt="logo"/>}
+            {channelAttrs.tvgLogoPath && <img className={classes.tvgLogo} src={channelAttrs.tvgLogoPath} alt="logo"/>}
             {channel.title}
           </Grid>
         </TableCell>
@@ -110,7 +131,7 @@ class ChannelTableRow extends Component {
             onInsertAfterChannel={this.handleInsertAfterChannel}
           />
         </TableCell>
-      </TableRow>
+      </CustomTableRow>
     );
   }
 }

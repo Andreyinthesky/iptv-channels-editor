@@ -1,7 +1,7 @@
 import {Component} from "react";
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
+import AddIcon from '@material-ui/icons/Add';
 import IconButton from "@material-ui/core/IconButton";
 import React from "react";
 
@@ -35,7 +35,7 @@ export default class InsertChannelMenu extends Component {
     return (
       <span>
         <IconButton onClick={this.handleClick} aria-label="Insert menu">
-          <MoreVertIcon />
+          <AddIcon />
         </IconButton>
         
         <Menu

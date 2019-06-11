@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {ChannelTable} from "./ChannelTable";
+import ChannelTable from "./ChannelTable";
 import EditChannelForm from "./EditChannelForm";
 
 export default class Channels extends Component {
@@ -36,6 +36,7 @@ export default class Channels extends Component {
           onInsertChannel={this.handleInsertChannel}
           onSelectChannel={this.handleSelectChannel}
           onSwapChannels={this.props.onSwapChannels}
+          onCheckChannel={this.props.onCheckChannel}
         />
         {this.state.channelIndexForEdit >= 0 && 
         <EditChannelForm

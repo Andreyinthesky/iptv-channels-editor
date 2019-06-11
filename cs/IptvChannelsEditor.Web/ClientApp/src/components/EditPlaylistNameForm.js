@@ -20,13 +20,8 @@ const editChannelFormStyles = theme => ({
   },
   formControl: {
     marginTop: theme.spacing.unit * 2,
-    minWidth: 200,
-    maxWidth: 300,
-  },
-  pathFormControl: {
-    marginTop: theme.spacing.unit * 2,
-    minWidth: 500,
-    maxWidth: 600,
+    minWidth: 400,
+    maxWidth: 500,
   },
   formControlLabel: {
     marginTop: theme.spacing.unit,
@@ -55,6 +50,8 @@ class EditPlaylistNameForm extends React.Component {
 
   handleChange = (event) => {
     const newPlaylistName = event.target.value;
+    if (newPlaylistName.length > 100)
+      return;
     this.setState({ playlistName: newPlaylistName});
   };
 
@@ -85,7 +82,7 @@ class EditPlaylistNameForm extends React.Component {
               </InputLabel>
               <OutlinedInput
                 id='title'
-                value={playlistName}
+                value={playlistName ? playlistName : undefined}
                 onChange={e => this.handleChange(e)}
                 labelWidth={this.titleRef ? this.titleRef.offsetWidth : 0}
               >
@@ -108,7 +105,7 @@ class EditPlaylistNameForm extends React.Component {
 
 EditPlaylistNameForm.propTypes = {
   classes: PropTypes.object.isRequired,
-  playlistName: PropTypes.object.isRequired,
+  playlistName: PropTypes.string.isRequired,
 };
 
 export default withStyles(editChannelFormStyles)(EditPlaylistNameForm);
