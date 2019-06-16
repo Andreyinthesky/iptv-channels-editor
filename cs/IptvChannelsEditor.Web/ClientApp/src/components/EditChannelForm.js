@@ -59,11 +59,10 @@ class EditChannelForm extends React.Component {
     this.setState({ channel: newChannel});
   };
 
-  //TODO: Add logoPath field
   render() {
     const { classes } = this.props;
     const channel = this.state.channel;
-    const { title, groupTitle, path } = channel;
+    const { title, groupTitle, path, tvgLogoPath } = channel;
 
     return (
       <Dialog
@@ -121,6 +120,21 @@ class EditChannelForm extends React.Component {
                 value={path ? path : undefined}
                 onChange={e => this.handleChange(e, 'path')}
                 labelWidth={this.pathRef ? this.pathRef.offsetWidth : 0}
+              >
+              </OutlinedInput>
+            </FormControl>
+            <FormControl className={classes.pathFormControl} variant='outlined'>
+              <InputLabel
+                ref={ref => {this.tvgLogoPathRef = ReactDOM.findDOMNode(ref)}}
+                htmlFor='tvgLogoPath'
+              >
+                Адрес логотипа
+              </InputLabel>
+              <OutlinedInput
+                id='tvgLogoPath'
+                value={tvgLogoPath ? tvgLogoPath : undefined}
+                onChange={e => this.handleChange(e, 'tvgLogoPath')}
+                labelWidth={this.tvgLogoPathRef ? this.tvgLogoPathRef.offsetWidth : 0}
               >
               </OutlinedInput>
             </FormControl>
