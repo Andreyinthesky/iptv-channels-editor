@@ -53,16 +53,21 @@ class EditChannelForm extends React.Component {
     this.props.onClose(channel);
   };
 
-  handleChange = (event, channelProp)=> {
+  handleChange = (event, channelProp, isAttribute = false)=> {
     const newChannel = Object.assign({}, this.state.channel);
-    newChannel[channelProp] = event.target.value;
+    newChannel.attributes = Object.assign({}, this.state.channel.attributes);
+    if (isAttribute)
+      newChannel.attributes[channelProp] = event.target.value;
+    else
+      newChannel[channelProp] = event.target.value;
     this.setState({ channel: newChannel});
   };
 
   render() {
     const { classes } = this.props;
     const channel = this.state.channel;
-    const { title, groupTitle, path, tvgLogoPath } = channel;
+    const { title, groupTitle, path } = channel;
+    const {tvgLogoPath} = channel.attributes;
 
     return (
       <Dialog
@@ -133,7 +138,7 @@ class EditChannelForm extends React.Component {
               <OutlinedInput
                 id='tvgLogoPath'
                 value={tvgLogoPath ? tvgLogoPath : undefined}
-                onChange={e => this.handleChange(e, 'tvgLogoPath')}
+                onChange={e => this.handleChange(e, 'tvgLogoPath', true)}
                 labelWidth={this.tvgLogoPathRef ? this.tvgLogoPathRef.offsetWidth : 0}
               >
               </OutlinedInput>

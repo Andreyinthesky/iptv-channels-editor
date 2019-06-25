@@ -9,6 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import EditIcon from '@material-ui/icons/Edit';
+import AddIcon from '@material-ui/icons/Add';
 import {getDefaultChannel} from "./helpers/playlistHelpers";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
@@ -50,10 +51,20 @@ const appStyles = theme => ({
     width: '300px',
     height: '300px',
   },
-  playlistToolbarIcon: {
+  editPlaylistNameButton: {
     marginLeft: theme.spacing.unit * 2, 
     verticalAlign: 'bottom',
     borderRadius: '20px',
+  },
+  addChannelButton: {
+    marginLeft: theme.spacing.unit * 2,
+    verticalAlign: 'bottom',
+    borderRadius: '20px',
+    color: theme.palette.getContrastText(lightGreen['A400']),
+    backgroundColor: lightGreen['A400'],
+    '&:hover': {
+      backgroundColor: lightGreen['A700'],
+    }
   },
   playlistName: {
     maxWidth: '650px',
@@ -136,8 +147,9 @@ class App extends Component {
   handleSelectAllChannels = () => {
     const isSelect = this.state.selectedChannelsCount !== this.state.channels.length;
     const newChannels = this.state.channels.slice().map(ch => {
-      ch.selected = isSelect;
-      return ch;
+      let newChannel = Object.assign({}, ch);
+      newChannel.selected = isSelect;
+      return newChannel;
     });
     
     this.setState({
@@ -182,12 +194,9 @@ class App extends Component {
     if (channel.path !== newChannels[index].path && channel.available !== undefined)
       channel.available = undefined;
     newChannels[index] = channel;
-    
-    console.log(channel);
 
     this.setState({channels: newChannels, allChangesSaved: false}, () => {
       this.savePlaylistSnapshot();
-      console.log(this.state.channels);
     });
   };
 
@@ -223,7 +232,7 @@ class App extends Component {
     playlistToFetch.nextChannelNumber = this.nextChannelNumber;
     
     return fetch(`api/playlist/${this.playlistId}`, {
-      method: 'PATCH',
+      method: 'PUT',
       headers: {
         "Content-Type": "application/json",
       },
@@ -249,6 +258,7 @@ class App extends Component {
       .then(() => {
         let anchor = document.createElement('a');
         anchor.setAttribute('href', `api/playlist/download/${this.playlistId}`);
+        anchor.setAttribute('download',"download");
         anchor.click();
       });
   };
@@ -272,6 +282,7 @@ class App extends Component {
           })
           .then(verdict => {
             console.log(channel.title + " : " + verdict);
+            newChannels[channelIndex] = Object.assign({}, newChannels[channelIndex]);
             newChannels[channelIndex].available = verdict;
             this.setState({channels: newChannels});
           })
@@ -296,8 +307,11 @@ class App extends Component {
         return response.json();
       })
       .then(playlist => {
-        if(!playlist)
+        if (!playlist || !playlist.id)
           return;
+        
+        if(!playlist.channels)
+          playlist.channels = [];
         
         this.loadPlaylist(playlist)
       })
@@ -345,6 +359,8 @@ class App extends Component {
     
     this.undoStack = [];
     this.doStack.push(snapshot);
+    
+    console.log(this.doStack);
   };
   
   undoAction = () => {
@@ -428,11 +444,21 @@ class App extends Component {
                 onClick={this.handleClickEditPlaylistNameButton}
                 variant="outlined"
                 size="small"
-                aria-label="Edit" 
-                className={classes.playlistToolbarIcon}
+                aria-label="Edit playlist name" 
+                className={classes.editPlaylistNameButton}
               >
                 <EditIcon className={classes.leftIcon} />
                 Изменить имя
+              </Button>
+              <Button
+                onClick={() => this.handleInsertChannel(this.state.channels.length)}
+                variant="outlined"
+                size="small"
+                aria-label="Add channel"
+                className={classes.addChannelButton}
+              >
+                <AddIcon className={classes.leftIcon} />
+                Добавить канал
               </Button>
             </Grid>
             { this.state.openEditPlaylistNameForm &&

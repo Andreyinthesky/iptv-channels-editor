@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net;
 
 namespace M3UPlaylistParser
 {
@@ -9,12 +6,12 @@ namespace M3UPlaylistParser
     {
         private const string PREFIX_EXTINF = "#EXTINF:";
         private const string PREFIX_EXTGRP = "#EXTGRP:";
-
+    
         internal Playlist Parse(IEnumerable<string> lines)
         {
             PlaylistItem currentItem = null;
             var items = new List<PlaylistItem>();
-
+    
             foreach (var line in lines)
             {
                 if (line.StartsWith(PREFIX_EXTINF))
@@ -32,10 +29,10 @@ namespace M3UPlaylistParser
                     currentItem = null;
                 }
             }
-
+    
             return new Playlist(items);
         }
-
+    
         private void ParsePlaylistItemItemInfo(string line, ref PlaylistItem playlistItem)
         {
             playlistItem = playlistItem ?? new PlaylistItem();
@@ -43,7 +40,7 @@ namespace M3UPlaylistParser
             var prevPosition = PREFIX_EXTINF.Length;
             var curPosition = prevPosition;
             string curAttributeName = null;
-
+    
             do
             {
                 switch (state)
@@ -109,14 +106,14 @@ namespace M3UPlaylistParser
                 }
             } while (++curPosition < line.Length);
         }
-
+    
         private void ParsePlaylistItemGroup(string line, ref PlaylistItem playlistItem)
         {
             playlistItem = playlistItem ?? new PlaylistItem();
             var result = line.Substring(PREFIX_EXTGRP.Length).Trim();
             playlistItem.GroupTitle = result;
         }
-
+    
         private void ParsePlaylistItemPath(string line, ref PlaylistItem playlistItem)
         {
             playlistItem = playlistItem ?? new PlaylistItem();

@@ -1,8 +1,6 @@
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using AutoMapper;
 using IptvChannelsEditor.Web.Domain;
 using IptvChannelsEditor.Web.Helpers;
@@ -11,7 +9,6 @@ using IptvChannelsEditor.Web.Models.Entities;
 using M3UPlaylistParser;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Win32.SafeHandles;
 
 namespace IptvChannelsEditor.Web.Controllers
 {
@@ -23,6 +20,18 @@ namespace IptvChannelsEditor.Web.Controllers
         public PlaylistController(IPlaylistRepository repository)
         {
             this.repository = repository;
+        }
+
+        [HttpPost("[action]")]
+        public IActionResult Create()
+        {
+            var playlistEntity = new PlaylistEntity
+            {
+                Name="Новый плейлист",
+            };
+            
+            repository.Insert(playlistEntity);
+            return Ok(playlistEntity);
         }
         
         [HttpPost("[action]")]
@@ -69,17 +78,17 @@ namespace IptvChannelsEditor.Web.Controllers
                 return NotFound();
             }
             
-            var fileName = playlist.Name + " " + DateTime.Now + ".m3u";
+            var fileName = playlist.Name + ".m3u";
             var contentType = "application/mpegurl";
             
             var memoryStream = new MemoryStream();
-            playlist.Channels
+            playlist.Channels?
                 .ForEach(channel => memoryStream.Write(Encoding.UTF8.GetBytes(channel.ToString())));
             memoryStream.Position = 0;
             return File(memoryStream, contentType, fileName);
         }
 
-        [HttpPatch("{playlistId}")]
+        [HttpPut("{playlistId}")]
         public IActionResult Update([FromRoute] Guid playlistId, [FromBody]UpdatePlaylistDto playlistDto)
         {          
             if (playlistDto == null)

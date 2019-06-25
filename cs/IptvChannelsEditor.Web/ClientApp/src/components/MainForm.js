@@ -26,6 +26,7 @@ const mainFormStyles = theme => ({
     backgroundColor: theme.palette.common.white,
     '&:hover': {
       cursor: 'pointer',
+      backgroundColor: '#c3c3c3',
     }
   },
   inputFile: {
@@ -65,6 +66,30 @@ class MainForm extends React.Component {
     this.inputFileCustom = React.createRef();
     this.fileRegex = /(.*)\\(.*$)/;
   }
+  
+  handleCreatePlaylist = () => {
+
+    fetch('api/playlist/create', {
+      method: 'POST',
+    })
+      .then(response => {
+        if (response.status !== 200) {
+          console.error('App Error: status: ' + response.status);
+          this.setState({isChoosingFile: false, isUploadingFile: false});
+          return;
+        }
+        return response.json();
+      })
+      .then(playlist => {
+        if (!playlist || !playlist.id)
+          return;
+        if(!playlist.channels)
+          playlist.channels = [];
+        setCookie("currentPlaylistId", playlist.id, {expires: 1000});
+        this.props.onUpload(playlist);
+      })
+      .catch(error => console.error('Error:', error));
+  };
 
   handleUploadPlaylist = event => {
     event.preventDefault();
@@ -108,7 +133,7 @@ class MainForm extends React.Component {
     }
     
     const matchResult = event.target.value.match(this.fileRegex);
-    this.inputFileCustom.current.value = 'File: ' +  matchResult[2];
+    this.inputFileCustom.current.value = 'Файл: ' +  matchResult[2];
     this.setState({isChoosingFile: false});
   };
   
@@ -152,6 +177,9 @@ class MainForm extends React.Component {
             </Grid>
           </Grid>
           <p className={classes.title}>*Доступные типы файлов: m3u, m3u8</p>
+          <Button variant="contained" size="medium" onClick={this.handleCreatePlaylist}>
+            Или создать новый
+          </Button>
         </form>
       </div>
     );

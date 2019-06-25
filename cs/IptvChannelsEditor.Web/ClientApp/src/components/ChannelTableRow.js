@@ -77,6 +77,23 @@ class ChannelTableRow extends Component {
     this.props.onCheckChannel(channel, index);
   };
   
+  shouldComponentUpdate(nextProps, nextState, nextContext) {
+    const curChannel = this.props.channel;
+    const nextChannel = nextProps.channel;
+    
+    if (curChannel.title !== nextChannel.title 
+      || curChannel.groupTitle !== nextChannel.groupTitle
+      || curChannel.path !== nextChannel.path
+      || curChannel.attributes.tvgLogoPath !== nextChannel.attributes.tvgLogoPath
+      || this.props.index !== nextProps.index)
+      return true;
+    
+    if (curChannel.available !== nextChannel.available)
+      return true;
+    
+    return curChannel.selected !== nextChannel.selected;
+  }
+
   render() {
     const {classes, index} = this.props;
     const channel = this.props.channel;
@@ -88,7 +105,8 @@ class ChannelTableRow extends Component {
           ? undefined
           : channel.available 
             ? '#41dc38b3' : '#3b3f4eb3',
-        transition: '1.5s ease',
+        transition: channel.available === undefined 
+          ? undefined : '1.5s ease',
       },
     }))(TableRow);
 
