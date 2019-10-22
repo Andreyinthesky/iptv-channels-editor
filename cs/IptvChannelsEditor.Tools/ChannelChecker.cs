@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using NReco.VideoInfo;
 
 namespace IptvChannelsEditor.Tools
@@ -10,10 +11,9 @@ namespace IptvChannelsEditor.Tools
     {
         private readonly string ffmpegPath;
         
-        public ChannelChecker()
+        public ChannelChecker(IConfiguration configuration)
         {
-            var directoryPath = new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath;
-            ffmpegPath = Path.Combine(Path.GetDirectoryName(directoryPath), "ffmpeg");
+            ffmpegPath = configuration.GetSection("FfmpegPath").Value;
         }
         
         public bool Check(string path)
