@@ -44,7 +44,7 @@ class TablePaginationActions extends React.Component {
   };
 
   render() {
-    const { classes, count, page, rowsPerPage, theme } = this.props;
+    const {classes, count, page, rowsPerPage, theme} = this.props;
 
     return (
       <div className={classes.root}>
@@ -53,28 +53,28 @@ class TablePaginationActions extends React.Component {
           disabled={page === 0}
           aria-label="First Page"
         >
-          {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
+          {theme.direction === 'rtl' ? <LastPageIcon/> : <FirstPageIcon/>}
         </IconButton>
         <IconButton
           onClick={this.handleBackButtonClick}
           disabled={page === 0}
           aria-label="Previous Page"
         >
-          {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+          {theme.direction === 'rtl' ? <KeyboardArrowRight/> : <KeyboardArrowLeft/>}
         </IconButton>
         <IconButton
           onClick={this.handleNextButtonClick}
           disabled={page >= Math.ceil(count / rowsPerPage) - 1}
           aria-label="Next Page"
         >
-          {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+          {theme.direction === 'rtl' ? <KeyboardArrowLeft/> : <KeyboardArrowRight/>}
         </IconButton>
         <IconButton
           onClick={this.handleLastPageButtonClick}
           disabled={page >= Math.ceil(count / rowsPerPage) - 1}
           aria-label="Last Page"
         >
-          {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
+          {theme.direction === 'rtl' ? <FirstPageIcon/> : <LastPageIcon/>}
         </IconButton>
       </div>
     );
@@ -90,31 +90,31 @@ TablePaginationActions.propTypes = {
   theme: PropTypes.object.isRequired,
 };
 
-const TablePaginationActionsWrapped = withStyles(tablePaginationActionsStyles, { withTheme: true })(
+const TablePaginationActionsWrapped = withStyles(tablePaginationActionsStyles, {withTheme: true})(
   TablePaginationActions
 );
 
 export default class ChannelTable extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       rowsPerPage: 5,
       curPage: 0,
     };
   }
-  
+
   handleChangePage = (event, page) => {
-    this.setState({ curPage: page });
+    this.setState({curPage: page});
   };
 
   handleChangeRowsPerPage = (event) => {
-    this.setState({ rowsPerPage: event.target.value });
+    this.setState({rowsPerPage: event.target.value});
   };
-  
+
   render() {
     const {channels} = this.props;
     const {rowsPerPage, curPage} = this.state;
-    
+
     return (
       <div>
         <TablePagination
@@ -139,7 +139,7 @@ export default class ChannelTable extends Component {
         <Table>
           <TableHead>
             {
-              channels.filter(ch => ch !== undefined).length > 0 && 
+              channels.filter(ch => ch !== undefined).length > 0 &&
               <TableRow>
                 <TableCell>№</TableCell>
                 <TableCell>Выбрать</TableCell>
@@ -151,19 +151,15 @@ export default class ChannelTable extends Component {
             }
           </TableHead>
           <TableBody>
-          {channels.slice(curPage * rowsPerPage, curPage * rowsPerPage + rowsPerPage)
-            .map((channel, index) => channel && 
-              <ChannelTableRow 
-                key={channel.id}
-                index = {curPage * rowsPerPage + index}                          
-                channel = {channel}
-                onEditChannel={this.props.onEditChannel}
-                onInsertChannel={this.props.onInsertChannel}
-                onSelectChannel={this.props.onSelectChannel}
-                onSwapChannels={this.props.onSwapChannels} 
-                onCheckChannel={this.props.onCheckChannel}
-              />
-          )}
+            {channels.slice(curPage * rowsPerPage, curPage * rowsPerPage + rowsPerPage)
+              .map((channel, index) => channel &&
+                <ChannelTableRow
+                  key={channel.id}
+                  index={curPage * rowsPerPage + index}
+                  channel={channel}
+                  {...this.props}
+                />
+              )}
           </TableBody>
         </Table>
       </div>

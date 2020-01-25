@@ -6,8 +6,10 @@ import Button from "@material-ui/core/Button";
 import DeleteIcon from '@material-ui/icons/Delete';
 import DoneAllIcon from '@material-ui/icons/DoneAll';
 import PropTypes from "prop-types";
+import appBarMainStyles from "./styles/AppBar.styles";
+import withStyles from "@material-ui/core/es/styles/withStyles";
 
-export default function AppBarForSelected(props) {
+function AppBarForSelected(props) {
   const {selectedChannelsCount, classes} = props;
   const {onDeleteSelectedChannels, onSelectAllChannels, onCheckSelectedChannels} = props;
   
@@ -39,3 +41,5 @@ export default function AppBarForSelected(props) {
 AppBarForSelected.propTypes = {
   classes: PropTypes.object.isRequired,
 };
+
+export default withStyles(appBarMainStyles)(AppBarForSelected);

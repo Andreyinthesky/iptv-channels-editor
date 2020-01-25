@@ -9,8 +9,10 @@ import AppBar from "@material-ui/core/AppBar";
 import UndoIcon from '@material-ui/icons/Undo';
 import RedoIcon from '@material-ui/icons/Redo';
 import Tooltip from "@material-ui/core/Tooltip";
+import appBarMainStyles from "./styles/AppBar.styles";
+import withStyles from "@material-ui/core/es/styles/withStyles";
 
-export default class AppBarMain extends React.Component {
+class AppBarMain extends React.Component {
   constructor(props){
     super(props);
     
@@ -43,7 +45,11 @@ export default class AppBarMain extends React.Component {
               <RedoIcon />
             </IconButton>
           </Tooltip>
-          <Button onClick={this.handleSwitchToMainForm} variant="contained" size="large" className={classes.largeButton}>
+          <Button 
+            onClick={this.handleSwitchToMainForm} 
+            variant="contained" size="large" 
+            className={classes.largeButton}
+          >
             Загрузить новый
           </Button>
           <Button onClick={this.handleSavePlaylist} variant="contained" size="large" color={"secondary"}
@@ -61,3 +67,5 @@ AppBarMain.propTypes = {
   classes: PropTypes.object.isRequired,
   allChangesSaved: PropTypes.bool.isRequired,
 };
+
+export default withStyles(appBarMainStyles)(AppBarMain);

@@ -1,124 +1,41 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import Channels from "./components/Channels";
 import AppBarForSelected from './components/AppBarForSelected';
 import AppBarMain from "./components/AppBarMain";
+import EditPlaylistNameForm from "./components/EditPlaylistNameForm";
+import PlaylistControlPanel from "./components/PlaylistControlPanel";
+import MainForm from "./components/MainForm";
+import appStyles from "./App.styles";
 import PropTypes from 'prop-types';
 import withStyles from '@material-ui/core/styles/withStyles';
-import {getCookie, deleteCookie} from "./helpers/cookieHelpers";
-import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
-import EditIcon from '@material-ui/icons/Edit';
-import AddIcon from '@material-ui/icons/Add';
-import {getDefaultChannel} from "./helpers/playlistHelpers";
 import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
-import EditPlaylistNameForm from "./components/EditPlaylistNameForm";
-import lightGreen from '@material-ui/core/colors/lightGreen';
-import MainForm from "./components/MainForm";
+import {getCookie, deleteCookie} from "./helpers/cookieHelpers";
+import {
+  checkChannel,
+  getDefaultChannel,
+  loadPlaylistById,
+  savePlaylist
+} from "./helpers/playlistHelpers";
 
-
-const appStyles = theme => ({
-  '@global': {
-    body: {
-      backgroundColor: theme.palette.primary.main,
-      margin: '0px',
-    },
-  },
-  paper: {
-    ...theme.mixins.gutters(),
-    marginTop: theme.spacing.unit * 9,
-    marginBottom: theme.spacing.unit * 9,
-    marginLeft: theme.spacing.unit * 1,
-    marginRight: theme.spacing.unit * 1,
-    paddingTop: theme.spacing.unit * 2,
-    paddingBottom: theme.spacing.unit * 2,
-    minWidth: '800px',
-  },
-  forSelectedBar: {
-    backgroundColor: theme.palette.primary.dark
-  },
-  largeButton:{
-    marginLeft: theme.spacing.unit * 2,
-    minWidth: '100px',
-  },
-  appIcon: {
-    width: theme.spacing.unit * 5,
-    height: theme.spacing.unit * 5,
-    marginRight: theme.spacing.unit * 2,
-  },
-  welcomeAppIcon: {
-    width: '300px',
-    height: '300px',
-  },
-  editPlaylistNameButton: {
-    marginLeft: theme.spacing.unit * 2, 
-    verticalAlign: 'bottom',
-    borderRadius: '20px',
-  },
-  addChannelButton: {
-    marginLeft: theme.spacing.unit * 2,
-    verticalAlign: 'bottom',
-    borderRadius: '20px',
-    color: theme.palette.getContrastText(lightGreen['A400']),
-    backgroundColor: lightGreen['A400'],
-    '&:hover': {
-      backgroundColor: lightGreen['A700'],
-    }
-  },
-  playlistName: {
-    maxWidth: '650px',
-  },
-  leftIcon: {
-    marginRight: theme.spacing.unit,
-  },
-  root: {
-    flexGrow: 1,
-  },
-  title: {
-    flexGrow: 1,
-    color: theme.palette.common.white,
-  },
-  allChangesSavedTitle: {
-    marginRight: theme.spacing.unit * 2,
-    textDecoration: 'underline',
-  },
-  downloadButtonDiv: {
-    display: 'flex',
-    flexDirection: 'row-reverse',
-  },
-  downloadButton: {
-    marginTop: theme.spacing.unit * 2,
-    marginLeft: theme.spacing.unit * 2,
-    minWidth: '100px',
-    width: '220px',
-    color: theme.palette.getContrastText(lightGreen['A400']),
-    backgroundColor: lightGreen['A400'],
-    '&:hover': {
-      backgroundColor: lightGreen['A700'],
-    }
-  },
-  '@media (min-width: 1280px)': {
-    paper: {
-      marginLeft: theme.spacing.unit * 9,
-      marginRight: theme.spacing.unit * 9,
-    }
-  }
-});
 
 class App extends Component {
   displayName = App.name;
 
   constructor(props) {
     super(props);
-    
+
+    this.doStack = [];
+    this.undoStack = [];
+
     this.state = {
-      loading: true,
+      isPlaylistLoad: false,
       selectedChannelsCount: 0,
       allChangesSaved: true,
-      playlistName : null,
+      playlistName: null,
       openEditPlaylistNameForm: false,
-      channels : [],
+      channels: [],
     };
   }
 
@@ -130,20 +47,27 @@ class App extends Component {
       if (channels[i] && !channels[i].selected)
         newChannels.push(channels[i]);
     }
-    this.setState({channels: newChannels, selectedChannelsCount : 0, allChangesSaved: false}, () => {
+    this.setState({
+      channels: newChannels,
+      selectedChannelsCount: 0,
+      allChangesSaved: false
+    }, () => {
       this.savePlaylistSnapshot();
     });
   };
-  
+
   handleSelectChannel = channelIndex => {
     const newChannels = this.state.channels.slice();
     const channel = Object.assign({}, newChannels[channelIndex]);
     channel.selected = !channel.selected;
     newChannels[channelIndex] = channel;
     let delta = channel.selected ? 1 : -1;
-    this.setState({selectedChannelsCount: this.state.selectedChannelsCount + delta, channels: newChannels});
+    this.setState({
+      selectedChannelsCount: this.state.selectedChannelsCount + delta,
+      channels: newChannels
+    });
   };
-  
+
   handleSelectAllChannels = () => {
     const isSelect = this.state.selectedChannelsCount !== this.state.channels.length;
     const newChannels = this.state.channels.slice().map(ch => {
@@ -151,11 +75,33 @@ class App extends Component {
       newChannel.selected = isSelect;
       return newChannel;
     });
-    
+
     this.setState({
       channels: newChannels,
       selectedChannelsCount: isSelect ? this.state.channels.length : 0,
     });
+  };
+
+  handleCheckSelectedChannels = () => {
+    const newChannels = this.state.channels.slice();
+    console.log('start check');
+
+    for (let channelIndex = 0; channelIndex < newChannels.length; channelIndex++) {
+      let channel = newChannels[channelIndex];
+
+      if (!channel || !channel.selected ||
+        !channel.path || channel.available !== undefined)
+        continue;
+
+      checkChannel(channel)
+        .then(verdict => {
+          console.log(channel.title + " : " + verdict);
+          newChannels[channelIndex] = Object.assign({}, newChannels[channelIndex]);
+          newChannels[channelIndex].available = verdict;
+          this.setState({channels: newChannels});
+        })
+        .catch(error => console.error('Error:', error));
+    }
   };
 
   handleInsertChannel = channelIndex => {
@@ -163,30 +109,36 @@ class App extends Component {
     newChannel.id = this.nextChannelNumber;
     newChannel.title += newChannel.id;
     this.nextChannelNumber++;
-    
+
     const channels = this.state.channels.slice();
     channels.splice(channelIndex, 0, newChannel);
-    this.setState({channels: channels, allChangesSaved: false}, () => {
+    this.setState({
+      channels: channels,
+      allChangesSaved: false
+    }, () => {
       this.savePlaylistSnapshot();
     });
   };
-  
+
   handleSwapChannels = (firstChannelIndex, secondChannelIndex) => {
     const newChannels = this.state.channels.slice();
-    
+
     if (firstChannelIndex < 0 || firstChannelIndex >= newChannels.length
       || secondChannelIndex < 0 || secondChannelIndex >= newChannels.length)
       return;
-    
+
     const tempChannel = newChannels[firstChannelIndex];
     newChannels[firstChannelIndex] = newChannels[secondChannelIndex];
     newChannels[secondChannelIndex] = tempChannel;
-    
-    this.setState({channels: newChannels, allChangesSaved: false}, () => {
+
+    this.setState({
+      channels: newChannels,
+      allChangesSaved: false
+    }, () => {
       this.savePlaylistSnapshot();
     });
   };
-  
+
   handleChangeChannel = (index, channel) => {
     if (!channel)
       return;
@@ -195,7 +147,10 @@ class App extends Component {
       channel.available = undefined;
     newChannels[index] = channel;
 
-    this.setState({channels: newChannels, allChangesSaved: false}, () => {
+    this.setState({
+      channels: newChannels,
+      allChangesSaved: false
+    }, () => {
       this.savePlaylistSnapshot();
     });
   };
@@ -203,13 +158,16 @@ class App extends Component {
   handleClickEditPlaylistNameButton = () => {
     this.setState({openEditPlaylistNameForm: true});
   };
-  
+
   handleChangePlaylistName = (newPlaylistName) => {
     this.setState({openEditPlaylistNameForm: false}, () => {
       if (!newPlaylistName || newPlaylistName === this.state.playlistName)
         return;
 
-      this.setState({playlistName: newPlaylistName, allChangesSaved: false}, () => {
+      this.setState({
+        playlistName: newPlaylistName,
+        allChangesSaved: false
+      }, () => {
         this.savePlaylistSnapshot();
       });
     });
@@ -217,199 +175,131 @@ class App extends Component {
 
   handleSwitchToMainForm = () => {
     deleteCookie("currentPlaylistId");
-    this.setState({loading: true});
+    this.setState({isPlaylistLoad: false});
   };
-  
-  handleSavePlaylist = (e) => {
+
+  handleSavePlaylist = () => {
     if (this.state.allChangesSaved)
       return Promise.resolve();
-    
-    this.setState({allChangesSaved: true});
-    
-    const playlistToFetch = {};
-    playlistToFetch.channels = this.state.channels;
-    playlistToFetch.name = this.state.playlistName;
-    playlistToFetch.nextChannelNumber = this.nextChannelNumber;
-    
-    return fetch(`api/playlist/${this.playlistId}`, {
-      method: 'PUT',
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(playlistToFetch),
-    })
-    .then(response => {
-      if (response.status === 204) {
-        console.log("saved successfully");
-      }
-      else {
-        console.error("Error: playlist is not saved, please try again");
-        this.setState({allChangesSaved: false});
-      }
-    })
-    .catch(error => {
-      console.error('Network error:', error);
-      this.setState({allChangesSaved: false});
-    });
+
+    const playlist = {};
+    playlist.channels = this.state.channels;
+    playlist.name = this.state.playlistName;
+    playlist.nextChannelNumber = this.nextChannelNumber;
+
+    return savePlaylist(this.playlistId, playlist)
+      .then(isSuccess => isSuccess && this.setState({allChangesSaved: true}));
   };
-  
+
   handleDownloadPlaylist = () => {
     this.handleSavePlaylist()
-      .then(() => {
+      .then(isSuccess => {
+        if (!isSuccess) {
+          console.error("Error on download playlist");
+          return;
+        }
+
         let anchor = document.createElement('a');
         anchor.setAttribute('href', `api/playlist/download/${this.playlistId}`);
-        anchor.setAttribute('download',"download");
+        anchor.setAttribute('download', "download");
         anchor.click();
       });
   };
 
-  handleCheckSelectedChannels = () => {
-    const newChannels = this.state.channels.slice();
-    
-    console.log('start check');
-    
-    for (let i = 0; i < newChannels.length; i++) {
-      if (newChannels[i] && newChannels[i].selected) {
-        let channel = newChannels[i];
-        let channelIndex = i;
-        
-        if (!channel.path || channel.available !== undefined)
-          continue;
-
-        fetch(`api/channel/check?path=${channel.path}`)
-          .then(response => {
-            return response.json();
-          })
-          .then(verdict => {
-            console.log(channel.title + " : " + verdict);
-            newChannels[channelIndex] = Object.assign({}, newChannels[channelIndex]);
-            newChannels[channelIndex].available = verdict;
-            this.setState({channels: newChannels});
-          })
-          .catch(error => console.error('Error:', error));
-      }
-    }
-  };
-
-  loadPlaylistById = (id) => {
-    if (!id)
-      return;
-    
-    fetch(`api/playlist/get/${id}`)
-      .then(response => {
-        if (response.status !== 200) {
-          if (response.status === 404) {
-            deleteCookie("currentPlaylistId");
-            this.forceUpdate();
-          }
-          return undefined;
-        }
-        return response.json();
-      })
-      .then(playlist => {
-        if (!playlist || !playlist.id)
-          return;
-        
-        if(!playlist.channels)
-          playlist.channels = [];
-        
-        this.loadPlaylist(playlist)
-      })
-      .catch(error => console.error('Error:', error));
-  };
-  
-  loadSampleChannels = () => {
-    fetch('api/sampleChannels')
-      .then(response => response.json())
+  loadPlaylistById = id => {
+    loadPlaylistById(id)
       .then(playlist => {
         this.loadPlaylist(playlist);
-      })
-      .catch(error => console.error('Error:', error));
+      });
   };
-  
+
   loadPlaylist = playlist => {
-    playlist.channels.map((channel, index) =>
-    {
+    playlist.channels.map((channel, index) => {
       channel.id = index;
       channel.selected = false;
       return channel;
     });
-    
+
     this.playlistId = playlist.id;
     this.nextChannelNumber = playlist.nextChannelNumber;
-    this.setState({loading: false, playlistName: playlist.name, channels: playlist.channels}, () => {
-      this.doStack = [];
-      this.undoStack = [];
-      this.doStack.push({playlistName: this.state.playlistName.slice(), channels: this.state.channels.slice()});
+    this.setState({
+      isPlaylistLoad: true,
+      playlistName: playlist.name,
+      channels: playlist.channels
+    }, () => {
+      this.doStack.push(
+        {
+          playlistName: this.state.playlistName,
+          channels: this.state.channels.slice()
+        }
+      );
     });
   };
-  
+
   savePlaylistSnapshot = () => {
     const channels = this.state.channels.slice()
       .map(ch => {
         let newChannel = Object.assign({}, ch);
         newChannel.selected = false;
         return newChannel;
-    });
-    
+      });
+
     const snapshot = {
       playlistName: this.state.playlistName,
-      channels: channels,  
+      channels: channels,
     };
-    
+
     this.undoStack = [];
     this.doStack.push(snapshot);
-    
+
     console.log(this.doStack);
   };
-  
+
   undoAction = () => {
     if (this.doStack.length <= 1)
       return;
 
     this.undoStack.push(this.doStack.pop());
     const snapshot = this.doStack[this.doStack.length - 1];
-    
+
     this.setState({
-      playlistName : snapshot.playlistName,
+      playlistName: snapshot.playlistName,
       channels: snapshot.channels,
       allChangesSaved: false
     });
   };
-  
+
   redoAction = () => {
     if (this.undoStack.length === 0)
       return;
-    
+
     const snapshot = this.undoStack.pop();
     this.setState({
-      playlistName : snapshot.playlistName, 
+      playlistName: snapshot.playlistName,
       channels: snapshot.channels,
       allChangesSaved: false
     }, () => {
       this.doStack.push(snapshot);
     });
   };
-  
+
   render() {
-    if (this.state.loading) {
+    if (!this.state.isPlaylistLoad) {
       const currentPlaylistId = getCookie("currentPlaylistId");
-      
+
       if (!currentPlaylistId)
-        return <MainForm onUpload={this.loadPlaylist} />;
-      
+        return <MainForm onUpload={this.loadPlaylist}/>;
+
       this.loadPlaylistById(currentPlaylistId);
       return null;
-      // this.loadSampleChannels();
     }
-    
+
     const {classes} = this.props;
-    
+
     return (
-      <div className={classes.root}>
-        {!this.state.selectedChannelsCount > 0 ? 
-          <AppBarMain 
-            classes={classes}
+      <React.Fragment>
+        {!this.state.selectedChannelsCount > 0 ?
+          <AppBarMain
             allChangesSaved={this.state.allChangesSaved}
             onSavePlaylist={this.handleSavePlaylist}
             onUndoAction={this.undoAction}
@@ -417,79 +307,49 @@ class App extends Component {
             onSwitchToMainForm={this.handleSwitchToMainForm}
           />
           :
-          <AppBarForSelected 
-            classes={classes}
+          <AppBarForSelected
             selectedChannelsCount={this.state.selectedChannelsCount}
             onDeleteSelectedChannels={this.handleDeleteSelectedChannels}
             onCheckSelectedChannels={this.handleCheckSelectedChannels}
             onSelectAllChannels={this.handleSelectAllChannels}
           />
         }
-        { !this.state.loading &&
-          <Paper className={classes.paper} elevation={1} square={true}>
-            <Grid 
-              container
-              direction="row"
-              justify="flex-start"
-              alignItems="baseline"
+        <Paper className={classes.paper} elevation={1} square={true}>
+          <PlaylistControlPanel
+            classes={classes}
+            playlistName={this.state.playlistName}
+            onClickEditPlaylistNameButton={this.handleClickEditPlaylistNameButton}
+            onClickInsertChannelButton={() => this.handleInsertChannel(this.state.channels.length)}
+          />
+          <Channels
+            channels={this.state.channels}
+            onSelectChannel={this.handleSelectChannel}
+            onInsertChannel={this.handleInsertChannel}
+            onChangeChannel={this.handleChangeChannel}
+            onSwapChannels={this.handleSwapChannels}
+            onCheckChannel={this.checkChannel}
+          />
+          <div className={classes.downloadButtonWrapper}>
+            <Button
+              variant="contained"
+              size="large"
+              color={"default"}
+              className={classes.downloadButton}
+              onClick={this.handleDownloadPlaylist}
             >
-              <Typography variant='h3' inline={true} className={classes.playlistName}>
-                {
-                  this.state.playlistName.length > 27
-                  ? this.state.playlistName.substr(0, 24) + "..." 
-                  : this.state.playlistName
-                }
-              </Typography>
-              <Button 
-                onClick={this.handleClickEditPlaylistNameButton}
-                variant="outlined"
-                size="small"
-                aria-label="Edit playlist name" 
-                className={classes.editPlaylistNameButton}
-              >
-                <EditIcon className={classes.leftIcon} />
-                Изменить имя
-              </Button>
-              <Button
-                onClick={() => this.handleInsertChannel(this.state.channels.length)}
-                variant="outlined"
-                size="small"
-                aria-label="Add channel"
-                className={classes.addChannelButton}
-              >
-                <AddIcon className={classes.leftIcon} />
-                Добавить канал
-              </Button>
-            </Grid>
-            { this.state.openEditPlaylistNameForm &&
-              <EditPlaylistNameForm 
-                onClose={this.handleChangePlaylistName}
-                playlistName={this.state.playlistName}
-              />
-            }
-            <Channels 
-              channels={this.state.channels}
-              onSelectChannel={this.handleSelectChannel}
-              onInsertChannel={this.handleInsertChannel}
-              onChangeChannel={this.handleChangeChannel}
-              onSwapChannels={this.handleSwapChannels}
-              onCheckChannel={this.checkChannel}
-            />
-            <div className={classes.downloadButtonDiv}>
-              <Button 
-                variant="contained"
-                size="large"
-                color={"default"}
-                className={classes.downloadButton}
-                onClick={this.handleDownloadPlaylist}
-              >
-                <SaveAltIcon className={classes.leftIcon} />
-                Скачать
-              </Button>
-            </div>
-          </Paper>
+              <SaveAltIcon className={classes.leftIcon}/>
+              Скачать
+            </Button>
+          </div>
+        </Paper>
+        {
+          this.state.openEditPlaylistNameForm &&
+          <EditPlaylistNameForm
+            onClose={this.handleChangePlaylistName}
+            playlistName={this.state.playlistName}
+          />
         }
-      </div>
+      </React.Fragment>
     );
   }
 }

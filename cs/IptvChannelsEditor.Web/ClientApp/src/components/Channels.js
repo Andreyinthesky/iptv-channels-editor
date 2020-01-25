@@ -6,9 +6,6 @@ export default class Channels extends Component {
 
   constructor(props){
     super(props);
-    this.handleSelectChannel = props.onSelectChannel;
-    this.handleInsertChannel = props.onInsertChannel;
-    this.handleChangeChannel = props.onChangeChannel;
     this.state = {
       channelIndexForEdit : -1,
     }
@@ -21,7 +18,7 @@ export default class Channels extends Component {
   handleCloseEditChannelForm = (changedChannel) => {
     const index = this.state.channelIndexForEdit;
     this.setState({channelIndexForEdit : -1}, () => {
-      this.handleChangeChannel(index, changedChannel);
+      this.props.onChangeChannel(index, changedChannel);
     });
   };
 
@@ -29,21 +26,18 @@ export default class Channels extends Component {
     const {channels} = this.props;
     
     return (
-      <div>
+      <React.Fragment>
         <ChannelTable
           channels={channels}
           onEditChannel={this.handleEditChannel}
-          onInsertChannel={this.handleInsertChannel}
-          onSelectChannel={this.handleSelectChannel}
-          onSwapChannels={this.props.onSwapChannels}
-          onCheckChannel={this.props.onCheckChannel}
+          {...this.props}
         />
         {this.state.channelIndexForEdit >= 0 && 
         <EditChannelForm
           channel={channels[this.state.channelIndexForEdit]}
           onClose={this.handleCloseEditChannelForm}
         />}
-      </div>
+      </React.Fragment>
     );
   }
 }
