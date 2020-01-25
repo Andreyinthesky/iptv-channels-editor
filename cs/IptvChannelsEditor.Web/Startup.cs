@@ -36,7 +36,6 @@ namespace IptvChannelsEditor.Web
                 options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 options.SerializerSettings.DefaultValueHandling = DefaultValueHandling.Populate;
             });
-            // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/build"; });
             services.AddSingleton<IMongoDatabaseProvider, IptvChannelsEditorMongoDatabase>();
             services.AddSingleton<IPlaylistRepository, MongoPlaylistRepository>();
@@ -50,7 +49,6 @@ namespace IptvChannelsEditor.Web
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
